@@ -3,7 +3,12 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:orientation="vertical">
-
+  <Button
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Search"
+      android:gravity="center"
+      android:id="@+id/search_city_button"/>
   <AutoCompleteTextView
       android:id="@+id/autoCompleteTextView"
       android:layout_width="match_parent"
