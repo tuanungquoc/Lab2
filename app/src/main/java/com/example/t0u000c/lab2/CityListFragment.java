@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 
@@ -73,8 +74,12 @@ public class CityListFragment extends ListFragment {
 //                    startActivityForResult(i, REQUEST_CITY);
 
                     try {
+                        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
+                                .build();
                         Intent intent =
                                 new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                                        .setFilter(typeFilter)
                                         .build(getActivity());
                         startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
                     } catch (GooglePlayServicesRepairableException e) {
