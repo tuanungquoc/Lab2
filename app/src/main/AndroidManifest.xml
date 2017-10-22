@@ -19,7 +19,10 @@
             <meta-data android:name="android.support.PARENT_ACTIVITY"
                 android:value=".CityListActivity"/>
         </activity>
-        <activity android:name=".CityDetailPagerActivity" />
+        <activity android:name=".CityDetailPagerActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                android:value=".CityListActivity"/>
+        </activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

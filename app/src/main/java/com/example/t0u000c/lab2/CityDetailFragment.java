@@ -2,10 +2,12 @@ package com.example.t0u000c.lab2;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NavUtils;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -40,6 +42,7 @@ public class CityDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID cityId = (UUID) getArguments().getSerializable(CityAddFragment.EXTRA_CITY_ID);
         mCity = CityListSingleton.get(getActivity()).getCity(cityId);
+        setHasOptionsMenu(true);
 
     }
 
@@ -53,7 +56,9 @@ public class CityDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState){
         View v = inflater.inflate(R.layout.fragment_city_detail,parent,false);
-
+        if (NavUtils.getParentActivityName(getActivity()) != null) {
+            getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         Log.d("TEST",mCity.getCityName());
         mCityHeader = (TextView) v.findViewById(R.id.city_header_name);
         mCityHeader.setText(mCity.getCityName());
@@ -95,5 +100,19 @@ public class CityDetailFragment extends Fragment {
 
         return v;
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // To be implemented next
+                if (NavUtils.getParentActivityName(getActivity()) != null) {
+                    NavUtils.navigateUpFromSameTask(getActivity());
+                }
+                return true;
+            default:
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
