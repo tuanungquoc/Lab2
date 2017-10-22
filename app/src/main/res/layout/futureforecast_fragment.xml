@@ -26,16 +26,17 @@
     android:layout_toRightOf="@+id/day_temperature_photo"
     android:layout_alignParentTop="true"
     android:textSize="30sp"
+        android:textColor="@color/cast_intro_overlay_button_background_color"
     />
 
-    <TextView
-    android:text="50 celcisus"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/day_temperature"
-    android:layout_toRightOf="@+id/day_temperature_photo"
-    android:layout_below="@+id/future_day"
-    />
+        <TextView
+            android:id="@+id/day_temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/future_day"
+            android:layout_toRightOf="@+id/day_temperature_photo"
+            android:text="50 celcisus"
+            android:textColor="@color/cast_intro_overlay_button_background_color" />
 
     </RelativeLayout>
 

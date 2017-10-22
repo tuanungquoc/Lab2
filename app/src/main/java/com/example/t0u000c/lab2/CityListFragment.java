@@ -36,7 +36,7 @@ public class CityListFragment extends ListFragment {
         public void onListItemClick(ListView l, View v, int position, long id) {
             City c = (City)(getListAdapter()).getItem(position);
             Log.d(TAG,c.getCityName() + " is clicked");
-            Intent i = new Intent(getActivity(), CityDetailActivity.class);
+            Intent i = new Intent(getActivity(), CityDetailPagerActivity.class);
             i.putExtra(CityAddFragment.EXTRA_CITY_ID, c.getmId());
             startActivityForResult(i, REQUEST_CITY_DETAIL);
 

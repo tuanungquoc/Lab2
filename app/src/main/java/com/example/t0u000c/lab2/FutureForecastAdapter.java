@@ -16,9 +16,9 @@ import java.util.ArrayList;
 
 public class FutureForecastAdapter extends Adapter<FutureForecastAdapter.ViewHolder> {
 
-    private ArrayList<String> myDataSet;
+    private ArrayList<DayForecast> myDataSet;
 
-    public FutureForecastAdapter(ArrayList<String> myDataSet) {
+    public FutureForecastAdapter(ArrayList<DayForecast> myDataSet) {
         this.myDataSet = myDataSet;
     }
 
@@ -33,8 +33,8 @@ public class FutureForecastAdapter extends Adapter<FutureForecastAdapter.ViewHol
 
     @Override
     public void onBindViewHolder(FutureForecastAdapter.ViewHolder holder, int position) {
-        holder.mFutureDay.setText(myDataSet.get(position));
-        holder.mDayTemperature.setText("50 celcius");
+        holder.mFutureDay.setText(myDataSet.get(position).getDay());
+        holder.mDayTemperature.setText(myDataSet.get(position).getAveTemp());
         holder.mDayTemperaturePhoto.setBackgroundResource(R.drawable.tempphoto);
     }
 

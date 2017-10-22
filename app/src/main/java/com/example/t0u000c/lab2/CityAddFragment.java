@@ -26,18 +26,26 @@ public class CityAddFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mCity = new City();
 
+        UUID cityId = (UUID)getArguments().getSerializable(EXTRA_CITY_ID);
+        mCity = CityListSingleton.get(getActivity()).getCity(cityId);
     }
 
+    public static CityAddFragment newInstance(UUID uId){
+        Bundle args = new Bundle();
+        args.putSerializable(EXTRA_CITY_ID,uId);
+        CityAddFragment fragment = new CityAddFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState){
         View v = inflater.inflate(R.layout.fragment_city,parent,false);
         autoCompleteTextView = (AutoCompleteTextView) v.findViewById(R.id.autoCompleteTextView);
         String[] words = getResources().getStringArray(R.array.auto_complete);
 
-        UUID cityId = (UUID) getActivity().getIntent().getSerializableExtra(CityAddFragment.EXTRA_CITY_ID);
-        mCity = CityListSingleton.get(getActivity()).getCity(cityId);
+//        UUID cityId = (UUID) getActivity().getIntent().getSerializableExtra(CityAddFragment.EXTRA_CITY_ID);
+//        mCity = CityListSingleton.get(getActivity()).getCity(cityId);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_list_item_1,words);
         autoCompleteTextView.setAdapter(adapter);
 

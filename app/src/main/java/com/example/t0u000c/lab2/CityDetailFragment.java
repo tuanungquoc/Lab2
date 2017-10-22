@@ -31,21 +31,29 @@ public class CityDetailFragment extends Fragment {
     private City mCity;
 
     private ArrayList<String> dailyForecastDataset;
-    private ArrayList<String> futureForecastDataset;
+    private ArrayList<DayForecast> futureForecastDataset;
 
     private TextView mCityHeader;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        UUID cityId = (UUID) getArguments().getSerializable(CityAddFragment.EXTRA_CITY_ID);
+        mCity = CityListSingleton.get(getActivity()).getCity(cityId);
 
     }
 
+    public static CityDetailFragment newInstance(UUID cityId){
+        Bundle args = new Bundle();
+        args.putSerializable(CityAddFragment.EXTRA_CITY_ID,cityId);
+        CityDetailFragment fragment = new CityDetailFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState){
         View v = inflater.inflate(R.layout.fragment_city_detail,parent,false);
-        UUID cityId = (UUID) getActivity().getIntent().getSerializableExtra(CityAddFragment.EXTRA_CITY_ID);
-        mCity  = CityListSingleton.get(getActivity()).getCity(cityId);
+
         Log.d("TEST",mCity.getCityName());
         mCityHeader = (TextView) v.findViewById(R.id.city_header_name);
         mCityHeader.setText(mCity.getCityName());
@@ -74,9 +82,10 @@ public class CityDetailFragment extends Fragment {
         // use a linear layout manager
         mFutureForecastLayoutManager = new LinearLayoutManager(getActivity());
         mFutureForecastView.setLayoutManager(mFutureForecastLayoutManager);
-        futureForecastDataset = new ArrayList<String>();
+        futureForecastDataset = new ArrayList<DayForecast>();
         for(int i = 0 ; i < 15 ; i++){
-            futureForecastDataset.add( i + " Day") ;
+            DayForecast dayForecast = new DayForecast(i+" Day", "50 celcius" , "");
+            futureForecastDataset.add( dayForecast) ;
         }
         // specify an adapter (see also next example)
         mFutureForecastAdapter = new FutureForecastAdapter(futureForecastDataset);
