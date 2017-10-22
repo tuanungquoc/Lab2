@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Weather Forecast</string>
+    <string name="city_name_hint">Please enter your city name</string>
+    <string name="new_city">New City</string>
+    <string-array name="auto_complete">
+        <item>San Jose</item>
+        <item>San Jose 1</item>
+        <item>Moutain View</item>
+    </string-array>
+</resources>
