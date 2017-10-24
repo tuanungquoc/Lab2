@@ -1,5 +1,7 @@
 package com.example.t0u000c.lab2;
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NavUtils;
@@ -11,6 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -35,7 +41,9 @@ public class CityDetailFragment extends Fragment {
     private ArrayList<String> dailyForecastDataset;
     private ArrayList<DayForecast> futureForecastDataset;
 
-    private TextView mCityHeader;
+    private TextView mCityHeader, mToday, mWeatherStatus ,mMax, mMin;
+    private networkConnect nc;
+    private View v;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,7 +51,10 @@ public class CityDetailFragment extends Fragment {
         UUID cityId = (UUID) getArguments().getSerializable(CityAddFragment.EXTRA_CITY_ID);
         mCity = CityListSingleton.get(getActivity()).getCity(cityId);
         setHasOptionsMenu(true);
-
+        if (mCity.getCityName() != null) {
+            nc = new networkConnect();
+            nc.execute();
+        }
     }
 
     public static CityDetailFragment newInstance(UUID cityId){
@@ -54,15 +65,12 @@ public class CityDetailFragment extends Fragment {
         return fragment;
     }
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState){
-        View v = inflater.inflate(R.layout.fragment_city_detail,parent,false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+
+        v = inflater.inflate(R.layout.fragment_city_detail, parent, false);
         if (NavUtils.getParentActivityName(getActivity()) != null) {
             getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        Log.d("TEST",mCity.getCityName());
-        mCityHeader = (TextView) v.findViewById(R.id.city_header_name);
-        mCityHeader.setText(mCity.getCityName());
-
         /**
          * Daily forecast
          */
@@ -114,5 +122,56 @@ public class CityDetailFragment extends Fragment {
             default:
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private class networkConnect extends AsyncTask<String, Void ,String> {
+
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            String stream = s;
+            JSONObject object = null;
+            try {
+                object = new JSONObject(stream);
+                JSONArray weatherArray = object.getJSONArray("weather");
+                JSONObject  weatherObject = weatherArray.getJSONObject(0);
+                Log.d("SetValues",weatherObject.getString("main") );
+                mCity.setWeather(weatherObject.getString("main"));
+                JSONObject mainObject = object.getJSONObject("main");
+                String  min = mainObject.getString("temp_min");
+                Log.d("SetValues",min );
+                mCity.setTemp_min(Double.valueOf(min));
+                String  max = mainObject.getString("temp_max");
+                Log.d("SetValues",max );
+                mCity.setTemp_max(Double.valueOf(max));
+
+                Log.d("TEST",mCity.getCityName());
+                mCityHeader = (TextView) v.findViewById(R.id.city_header_name);
+                mCityHeader.setText(mCity.getCityName());
+                mToday=  (TextView) v.findViewById(R.id.today);
+                mToday.setText(Api.gettodayDate());
+                mWeatherStatus = (TextView) v.findViewById(R.id.weatherStatus);
+                mWeatherStatus.setText(mCity.getWeather());
+                Log.d("SeetingLAyout",mCity.getWeather());
+                mMax = (TextView) v.findViewById(R.id.max);
+                mMax.setText(Double.toString(mCity.getTemp_max()));
+                Log.d("SeetingLAyout",Double.toString( mCity.getTemp_max()));
+                mMin = (TextView) v.findViewById(R.id.min);
+                mMin.setText(Double.toString(mCity.getTemp_min()));
+                Log.d("SeetingLAyout",Double.toString( mCity.getTemp_min()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            Connection con = new Connection();
+            String stream = con.getUrlData(Api.requestCityNow(mCity.getCityName() + "," + mCity.getIsoCountry()));
+            return stream;
+        }
     }
 }

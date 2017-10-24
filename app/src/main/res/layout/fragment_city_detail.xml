@@ -1,15 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:textSize="50dp"
+        android:textSize="30sp"
         android:layout_margin="10dp"
         android:layout_centerInParent="true"
         android:gravity="center"
         android:id="@+id/city_header_name" />
+
+    <TextView
+        android:id="@+id/today"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text=""
+        android:textAlignment="center"
+        android:textSize="15sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <TextView
+            android:id="@+id/weatherStatus"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:text="Sunny"
+            android:layout_weight="2"
+            android:textAlignment="center"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/max"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:layout_weight="0.5"
+            android:text="30"
+            android:gravity="center_vertical|right|end"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/min"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:layout_weight="0.5"
+            android:text="15"
+            android:gravity="center_vertical|left|start"
+            android:textSize="15sp"
+            android:visibility="visible" />
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
@@ -17,6 +65,7 @@
         android:textSize="20dp"
         android:text="Daily Forecast"
         android:layout_margin="5dp"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/daily_forecast_view"
         android:layout_width="wrap_content"
