@@ -18,7 +18,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -95,15 +98,15 @@ public class CityDetailFragment extends Fragment {
         // use a linear layout manager
         mFutureForecastLayoutManager = new LinearLayoutManager(getActivity());
         mFutureForecastView.setLayoutManager(mFutureForecastLayoutManager);
-        futureForecastDataset = new ArrayList<DayForecast>();
-        for(int i = 0 ; i < 15 ; i++){
+       /* futureForecastDataset = new ArrayList<DayForecast>();
+        for(int i = 0 ; i < 5 ; i++){
             DayForecast dayForecast = new DayForecast(i+" Day", "50 celcius" , "");
             futureForecastDataset.add( dayForecast) ;
         }
         // specify an adapter (see also next example)
         mFutureForecastAdapter = new FutureForecastAdapter(futureForecastDataset);
         mFutureForecastView.setAdapter(mFutureForecastAdapter);
-
+*/
 
 
         return v;
@@ -125,13 +128,16 @@ public class CityDetailFragment extends Fragment {
     }
 
 
-    private class networkConnect extends AsyncTask<String, Void ,String> {
+    private class networkConnect extends AsyncTask<String, Void ,Wrapper> {
 
 
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            String stream = s;
+        //@Override
+        protected void onPostExecute(Wrapper w) {
+            Log.d("POST ", "inside");
+            super.onPostExecute(w);
+            Log.d("Got day values JSON:",w.dayWeather );
+            Log.d("Got hourly values JSON:",w.hourlyweather );
+            String stream = w.dayWeather;
             JSONObject object = null;
             try {
                 object = new JSONObject(stream);
@@ -161,6 +167,57 @@ public class CityDetailFragment extends Fragment {
                 mMin = (TextView) v.findViewById(R.id.min);
                 mMin.setText(Double.toString(mCity.getTemp_min()));
                 Log.d("SeetingLAyout",Double.toString( mCity.getTemp_min()));
+
+                 /*mFutureForecastView = (RecyclerView) v.findViewById(R.id.future_forecast_view);
+        mFutureForecastView.setHasFixedSize(true);
+        // use a linear layout manager
+        mFutureForecastLayoutManager = new LinearLayoutManager(getActivity());
+        mFutureForecastView.setLayoutManager(mFutureForecastLayoutManager);
+        futureForecastDataset = new ArrayList<DayForecast>();
+        for(int i = 0 ; i < 5 ; i++){
+            DayForecast dayForecast = new DayForecast(i+" Day", "50 celcius" , "");
+            futureForecastDataset.add( dayForecast) ;
+        }
+        // specify an adapter (see also next example)
+        mFutureForecastAdapter = new FutureForecastAdapter(futureForecastDataset);
+        mFutureForecastView.setAdapter(mFutureForecastAdapter);*/
+
+                //Future
+//                mFutureForecastView = (RecyclerView) v.findViewById(R.id.future_forecast_view);
+//                mFutureForecastView.setHasFixedSize(false);
+//                // use a linear layout manager
+//                mFutureForecastLayoutManager = new LinearLayoutManager(CityDetailFragment.this);
+//                mFutureForecastView.setLayoutManager(mFutureForecastLayoutManager);
+                JSONObject fiveDays = new JSONObject(w.hourlyweather);
+                JSONArray fiveDaysArray = fiveDays.getJSONArray("list");
+                Log.d("FIVE DARYS", String.valueOf(fiveDaysArray));
+                futureForecastDataset = new ArrayList<DayForecast>();
+                for(int i = 0 ; i < fiveDaysArray.length() ; i++){
+
+                    SimpleDateFormat newDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    try {
+                        Log.d(String.valueOf(i), fiveDaysArray.getJSONObject(i).getString("dt_txt"));
+                        Date MyDate = newDateFormat.parse(fiveDaysArray.getJSONObject(i).getString("dt_txt"));
+                        newDateFormat.applyPattern("HH");
+                        Log.d("DAte:", newDateFormat.format(MyDate));
+                        if(newDateFormat.format(MyDate).equals("12")) {
+                            Log.d("DAte:", String.valueOf(MyDate));
+                            newDateFormat.applyPattern("EEE");
+                            DayForecast dayForecast = new DayForecast(newDateFormat.format(MyDate),
+                                    fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp_max"),
+                                    fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp_min"),
+                                    fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("icon"));
+                            futureForecastDataset.add(dayForecast);
+                        }
+                    } catch (ParseException e) {
+                        Log.e("parsing error","Error in parsing at hourly" );
+                        e.printStackTrace();
+                    }
+
+                }
+                // specify an adapter (see also next example)
+                mFutureForecastAdapter = new FutureForecastAdapter(getActivity(),futureForecastDataset);
+                mFutureForecastView.setAdapter(mFutureForecastAdapter);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -168,10 +225,13 @@ public class CityDetailFragment extends Fragment {
         }
 
         @Override
-        protected String doInBackground(String... strings) {
+        protected Wrapper doInBackground(String... strings) {
             Connection con = new Connection();
-            String stream = con.getUrlData(Api.requestCityNow(mCity.getCityName() + "," + mCity.getIsoCountry()));
-            return stream;
+            Wrapper w = new Wrapper();
+            w.dayWeather = con.getUrlData(Api.requestCityNow(mCity.getCityName() + "," + mCity.getIsoCountry()));
+            w.hourlyweather = con.getUrlData(Api.requestCity24Hrs(mCity.getCityName() + "," + mCity.getIsoCountry()));
+            Log.d("Background", "before");
+            return w;
         }
     }
 }

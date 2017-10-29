@@ -25,9 +25,9 @@ public class Api {
         return sb.toString();
     }
 
-    public static String requestCity10Days(String city){
+    public static String requestCity6Days(String city){
         StringBuilder sb= new StringBuilder(linkForecastDays);
-        sb.append(String.format("?q=%s&APPID=%s&units=metric&cnt=%s",city,key,"11"));
+        sb.append(String.format("?q=%s&APPID=%s&units=metric&cnt=%s",city,key,"6"));
         Log.d("10days", sb.toString() );
         return sb.toString();
     }

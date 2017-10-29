@@ -1,5 +1,6 @@
 package com.example.t0u000c.lab2;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.Adapter;
 import android.view.LayoutInflater;
@@ -7,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -17,9 +20,11 @@ import java.util.ArrayList;
 public class FutureForecastAdapter extends Adapter<FutureForecastAdapter.ViewHolder> {
 
     private ArrayList<DayForecast> myDataSet;
+    private Context context;
 
-    public FutureForecastAdapter(ArrayList<DayForecast> myDataSet) {
+    public FutureForecastAdapter(Context context, ArrayList<DayForecast> myDataSet) {
         this.myDataSet = myDataSet;
+        this.context=context;
     }
 
     @Override
@@ -34,8 +39,9 @@ public class FutureForecastAdapter extends Adapter<FutureForecastAdapter.ViewHol
     @Override
     public void onBindViewHolder(FutureForecastAdapter.ViewHolder holder, int position) {
         holder.mFutureDay.setText(myDataSet.get(position).getDay());
-        holder.mDayTemperature.setText(myDataSet.get(position).getAveTemp());
-        holder.mDayTemperaturePhoto.setBackgroundResource(R.drawable.tempphoto);
+        holder.mMaxTemperature.setText(myDataSet.get(position).getmMaxTemp());
+        holder.mMinTemperature.setText(myDataSet.get(position).getmMinTemp());
+        Picasso.with(context).load(myDataSet.get(position).getPhotoSrc()).into(holder.mDayTemperaturePhoto);
     }
 
     @Override
@@ -47,13 +53,15 @@ public class FutureForecastAdapter extends Adapter<FutureForecastAdapter.ViewHol
 
         public ImageView mDayTemperaturePhoto;
         public TextView mFutureDay;
-        public TextView mDayTemperature;
+        public TextView mMaxTemperature;
+        public TextView mMinTemperature;
 
         public ViewHolder(View itemView) {
             super(itemView);
             mDayTemperaturePhoto = (ImageView) itemView.findViewById(R.id.day_temperature_photo);
             mFutureDay = (TextView) itemView.findViewById(R.id.future_day);
-            mDayTemperature = (TextView) itemView.findViewById(R.id.day_temperature);
+            mMaxTemperature = (TextView) itemView.findViewById(R.id.max_temp);
+            mMinTemperature = (TextView) itemView.findViewById(R.id.min_temp);
         }
     }
 }
