@@ -11,7 +11,14 @@
         android:layout_centerInParent="true"
         android:gravity="center"
         android:id="@+id/city_header_name" />
-
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:textSize="15sp"
+        android:layout_margin="10dp"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:id="@+id/current_location" />
     <TextView
         android:id="@+id/today"
         android:layout_width="match_parent"

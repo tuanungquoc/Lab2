@@ -1,14 +1,19 @@
 package com.example.t0u000c.lab2;
 
 import android.content.Intent;
+import android.os.Build;
 import android.support.v4.app.ListFragment;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -46,6 +51,8 @@ public class CityListFragment extends ListFragment {
 
         }
 
+
+
         @Override
         public void onListItemClick(ListView l, View v, int position, long id) {
             City c = (City)(getListAdapter()).getItem(position);
@@ -60,6 +67,40 @@ public class CityListFragment extends ListFragment {
         public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
             super.onCreateOptionsMenu(menu, inflater);
             inflater.inflate(R.menu.fragment_city_list, menu);
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu,View v, ContextMenu.ContextMenuInfo menuInfo){
+            getActivity().getMenuInflater().inflate(R.menu.city_list_item_context,menu);
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+            View v = super.onCreateView(inflater, parent, savedInstanceState);
+            ListView listView = (ListView) v.findViewById(android.R.id.list);
+            registerForContextMenu(listView);
+            return v;
+        }
+
+        @Override
+        public boolean onContextItemSelected(MenuItem item) {
+            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+            int position = info.position;
+            ArrayAdapter<City> adapter = (ArrayAdapter<City>) getListAdapter();
+            City citySelected = adapter.getItem(position);
+            switch (item.getItemId()) {
+                case R.id.menu_item_delete_city:
+                    CityListSingleton.get(getActivity()).deleteCity(citySelected);
+                    adapter.notifyDataSetChanged();
+                    return true;
+            }
+            return super.onContextItemSelected(item);
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+            CityListSingleton.get(getActivity()).saveCrimes();
         }
 
         @Override

@@ -16,6 +16,8 @@ import java.util.UUID;
 
 public class City {
 
+    private static final String JSON_ID = "id";
+    private static final String JSON_NAME = "name";
     private UUID mId;
     private String cityName =null;
 
@@ -31,6 +33,23 @@ public class City {
     private String weather;
     private double temp_min;
     private double temp_max;
+
+    public  City(){
+        mId = UUID.randomUUID();
+        cityName = "";
+    }
+
+    public City(JSONObject json) throws JSONException {
+        mId = UUID.fromString(json.getString(JSON_ID));
+        cityName = json.getString(JSON_NAME);
+    }
+
+    public JSONObject toJSON() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put(JSON_ID, mId.toString());
+        json.put(JSON_NAME, cityName);
+        return json;
+    }
 
     public String getWeather() {
         return weather;
@@ -56,10 +75,7 @@ public class City {
         this.temp_max = temp_max;
     }
 
-    public  City(){
-        mId = UUID.randomUUID();
-        cityName = "";
-    }
+
 
     public UUID getmId() {
         return mId;

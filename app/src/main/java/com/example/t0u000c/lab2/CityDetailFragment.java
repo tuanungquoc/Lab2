@@ -1,10 +1,16 @@
 package com.example.t0u000c.lab2;
 
-import android.app.ProgressDialog;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,16 +19,32 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+
+import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
+import android.Manifest;
 
 /**
  * Created by t0u000c on 10/21/17.
@@ -44,9 +66,11 @@ public class CityDetailFragment extends Fragment {
     private ArrayList<String> dailyForecastDataset;
     private ArrayList<DayForecast> futureForecastDataset;
 
-    private TextView mCityHeader, mToday, mWeatherStatus ,mMax, mMin;
+    private TextView mCityHeader, mToday, mWeatherStatus ,mMax, mMin, mCurrentLocation;
     private networkConnect nc;
     private View v;
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,6 +82,8 @@ public class CityDetailFragment extends Fragment {
             nc = new networkConnect();
             nc.execute();
         }
+
+
     }
 
     public static CityDetailFragment newInstance(UUID cityId){
@@ -107,8 +133,9 @@ public class CityDetailFragment extends Fragment {
         mFutureForecastAdapter = new FutureForecastAdapter(futureForecastDataset);
         mFutureForecastView.setAdapter(mFutureForecastAdapter);
 */
-
-
+        mCurrentLocation = (TextView) v.findViewById(R.id.current_location);
+        startLocationUpdates();
+        getLastLocation();
         return v;
 
     }
@@ -233,5 +260,114 @@ public class CityDetailFragment extends Fragment {
             Log.d("Background", "before");
             return w;
         }
+    }
+
+
+
+
+
+
+    private LocationRequest mLocationRequest;
+    private long UPDATE_INTERVAL = 10 * 1000;  /* 10 secs */
+    private long FASTEST_INTERVAL = 2000; /* 2 sec */
+    private void startLocationUpdates() {
+        // Create the location request to start receiving updates
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+
+        // Create LocationSettingsRequest object using location request
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(mLocationRequest);
+        LocationSettingsRequest locationSettingsRequest = builder.build();
+
+        // Check whether location settings are satisfied
+        // https://developers.google.com/android/reference/com/google/android/gms/location/SettingsClient
+        SettingsClient settingsClient = LocationServices.getSettingsClient(this.getActivity());
+        settingsClient.checkLocationSettings(locationSettingsRequest);
+
+        // new Google API SDK v11 uses getFusedLocationProviderClient(this)
+        if (ActivityCompat.checkSelfPermission(this.getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        getFusedLocationProviderClient(getActivity()).requestLocationUpdates(mLocationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        // do work here
+                        try {
+                            onLocationChanged(locationResult.getLastLocation());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                Looper.myLooper());
+
+    }
+
+
+
+    public void onLocationChanged(Location location) throws IOException {
+        // New location has now been determined
+        String msg = "Updated Location: " +
+                Double.toString(location.getLatitude()) + "," +
+                Double.toString(location.getLongitude());
+        // You can now create a LatLng Object for use with maps
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+        Geocoder geocoder;
+        List<Address> addresses;
+        geocoder = new Geocoder(getActivity(), Locale.getDefault());
+
+        addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+        if (mCity.getCityName().equals(addresses.get(0).getLocality())){
+            mCurrentLocation.setText("You are here");
+        }
+    }
+
+
+
+
+    public void getLastLocation() {
+        // Get last known recent location using new Google Play Services SDK (v11+)
+        FusedLocationProviderClient locationClient = getFusedLocationProviderClient(this.getActivity());
+        if (ActivityCompat.checkSelfPermission(this.getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                // GPS location can be null if GPS is switched off
+                if (location != null) {
+                    try {
+                        onLocationChanged(location);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                Log.d("MapDemoActivity", "Error trying to get last GPS location");
+                e.printStackTrace();
+            }
+        });
+
     }
 }
