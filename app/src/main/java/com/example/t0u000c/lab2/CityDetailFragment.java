@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import static android.webkit.ConsoleMessage.MessageLevel.LOG;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 import android.Manifest;
 
@@ -72,6 +73,9 @@ public class CityDetailFragment extends Fragment {
     private View v;
 
     private Geocoder geocoder;
+    private LocationRequest mLocationRequest;
+    private static int INTERVAL_UPDATE = 10000;
+    private static int FASTEST_INTERVAL = 2000;
 
 
     @Override
@@ -322,17 +326,18 @@ public class CityDetailFragment extends Fragment {
 
 
 
-    private LocationRequest mLocationRequest;
-    private long UPDATE_INTERVAL = 10 * 1000;  /* 10 secs */
-    private long FASTEST_INTERVAL = 2000; /* 2 sec */
+
     private void startLocationUpdates() {
-        // Create the location request to start receiving updates
+        if (ActivityCompat.checkSelfPermission(this.getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this.getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
         mLocationRequest = new LocationRequest();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setInterval(INTERVAL_UPDATE);
         mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
 
-        // Create LocationSettingsRequest object using location request
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addLocationRequest(mLocationRequest);
         LocationSettingsRequest locationSettingsRequest = builder.build();
@@ -342,17 +347,7 @@ public class CityDetailFragment extends Fragment {
         SettingsClient settingsClient = LocationServices.getSettingsClient(this.getActivity());
         settingsClient.checkLocationSettings(locationSettingsRequest);
 
-        // new Google API SDK v11 uses getFusedLocationProviderClient(this)
-        if (ActivityCompat.checkSelfPermission(this.getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
+
         getFusedLocationProviderClient(getActivity()).requestLocationUpdates(mLocationRequest, new LocationCallback() {
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
@@ -371,16 +366,13 @@ public class CityDetailFragment extends Fragment {
 
 
     public void onLocationChanged(Location location) throws IOException {
-        // New location has now been determined
-        String msg = "Updated Location: " +
-                Double.toString(location.getLatitude()) + "," +
-                Double.toString(location.getLongitude());
-        // You can now create a LatLng Object for use with maps
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
+        Log.d("Location update", + location.getLatitude() + " - " + location.getLongitude());
+
+        LatLng locationLatLonObj = new LatLng(location.getLatitude(), location.getLongitude());
         List<Address> addresses;
-
-        addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+        //parsing lat long position to get address and extract into addresses
+        addresses = geocoder.getFromLocation(locationLatLonObj.latitude, locationLatLonObj.longitude, 1);
         if (mCity.getCityName().equals(addresses.get(0).getLocality())){
             mCurrentLocation.setText("You are here");
         }
@@ -390,18 +382,14 @@ public class CityDetailFragment extends Fragment {
 
 
     public void getLastLocation() {
-        // Get last known recent location using new Google Play Services SDK (v11+)
-        FusedLocationProviderClient locationClient = getFusedLocationProviderClient(this.getActivity());
-        if (ActivityCompat.checkSelfPermission(this.getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+        //Checking to see if ACCESS_FINE_LOCATION or ACCESS_COARSE_LOCATION permission get granted
+        // if not then won't do anything
+        if (ActivityCompat.checkSelfPermission(this.getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this.getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
             return;
         }
+        FusedLocationProviderClient locationClient = getFusedLocationProviderClient(this.getActivity());
         locationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
@@ -417,7 +405,7 @@ public class CityDetailFragment extends Fragment {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(Exception e) {
-                Log.d("MapDemoActivity", "Error trying to get last GPS location");
+                Log.d("Last location", "Error to get last location");
                 e.printStackTrace();
             }
         });
