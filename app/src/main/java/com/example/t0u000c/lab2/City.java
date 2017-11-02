@@ -31,6 +31,7 @@ public class City {
 
     private String isoCountry ="US";
     private String weather;
+    private double temp;
     private double temp_min;
     private double temp_max;
 
@@ -92,6 +93,14 @@ public class City {
 
     public String toString(){
         return this.cityName;
+    }
+
+    public double getTemp() {
+        return temp;
+    }
+
+    public void setTemp(double temp) {
+        this.temp = temp;
     }
 
 }

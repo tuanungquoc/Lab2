@@ -185,6 +185,9 @@ public class CityDetailFragment extends Fragment {
                 String  max = mainObject.getString("temp_max");
                 Log.d("SetValues",max );
                 mCity.setTemp_max(Double.valueOf(max));
+                String  tempp = mainObject.getString("temp");
+                Log.d("SetValues",tempp );
+                mCity.setTemp(Double.valueOf(tempp));
 
                 Log.d("TEST",mCity.getCityName());
                 mCityHeader = (TextView) v.findViewById(R.id.city_header_name);
