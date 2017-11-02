@@ -71,6 +71,7 @@ public class CityDetailFragment extends Fragment {
     private networkConnect nc;
     private View v;
 
+    private Geocoder geocoder;
 
 
     @Override
@@ -98,6 +99,7 @@ public class CityDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
 
         v = inflater.inflate(R.layout.fragment_city_detail, parent, false);
+        geocoder = new Geocoder(getActivity(), Locale.getDefault());
         if (NavUtils.getParentActivityName(getActivity()) != null) {
             getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
         }
@@ -376,9 +378,7 @@ public class CityDetailFragment extends Fragment {
         // You can now create a LatLng Object for use with maps
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-        Geocoder geocoder;
         List<Address> addresses;
-        geocoder = new Geocoder(getActivity(), Locale.getDefault());
 
         addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
         if (mCity.getCityName().equals(addresses.get(0).getLocality())){
