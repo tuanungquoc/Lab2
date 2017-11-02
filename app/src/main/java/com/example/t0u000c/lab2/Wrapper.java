@@ -8,4 +8,7 @@ public class Wrapper {
 
     public String dayWeather;
     public String hourlyweather;
+    public String localtimezone;
+    public long localtimetoUTCunix;
+    public long tomorrowlocaldatetoUTCunix;
 }
