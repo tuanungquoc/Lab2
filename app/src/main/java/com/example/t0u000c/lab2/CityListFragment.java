@@ -59,6 +59,7 @@ public class CityListFragment extends ListFragment {
             Log.d(TAG,c.getCityName() + " is clicked");
             Intent i = new Intent(getActivity(), CityDetailPagerActivity.class);
             i.putExtra(CityAddFragment.EXTRA_CITY_ID, c.getmId());
+
             startActivityForResult(i, REQUEST_CITY_DETAIL);
 
         }
@@ -139,12 +140,27 @@ public class CityListFragment extends ListFragment {
                 if (resultCode == RESULT_OK) {
                     Place place = PlaceAutocomplete.getPlace(getActivity(), data);
                     String cityName = place.getName().toString();
+                    double lat = place.getLatLng().latitude;
+                    double lon = place.getLatLng().longitude;
+                    String[] address = (place.getAddress()+"").split(",");
+                    String country = "";
+                    String state = "";
+                    if(address.length == 2){
+                        country = address[1].trim();
+                    }else if(address.length == 3){
+                        state = address[1].trim();
+                        country = address[2].trim();
+                    }
                     Log.i(TAG, "Place: " + cityName);
 
                     City mCity = CityListSingleton.get(getActivity()).getmCities().get(CityListSingleton.get(getActivity()).getmCities().size()-1);
                     int pos = CityListSingleton.get(getActivity()).getCityByName(cityName);
                     if (pos == -1) {
                         mCity.setCityName(cityName);
+                        mCity.setLat(lat);
+                        mCity.setLon(lon);
+                        mCity.setCountry(country);
+                        mCity.setState(state);
 
                     } else {
                         CityListSingleton.get(getActivity()).getmCities().remove(CityListSingleton.get(getActivity()).getmCities().size() - 1);
