@@ -91,68 +91,9 @@ public class CityDetailFragment extends Fragment {
         mCity = CityListSingleton.get(getActivity()).getCity(cityId);
         setHasOptionsMenu(true);
         if (mCity.getCityName() != null) {
-            processCityViewHeader(mCity);
             processCityViewTimeZone(mCity);
 
         }
-
-
-
-    }
-
-    public  void processCityViewHeader(City city){
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
-                Api.requestCityNow(city.getCityName() + "," + city.getIsoCountry()), new JSONObject(),
-                new Response.Listener<JSONObject>()
-                {
-                    @Override
-                    public void onResponse(JSONObject response)
-                    {
-                        try {
-                            JSONObject object = new JSONObject(response.toString());
-
-                            JSONArray weatherArray = object.getJSONArray("weather");
-                            JSONObject weatherObject = weatherArray.getJSONObject(0);
-                            Log.d("SetValues", weatherObject.getString("main"));
-                            mCity.setWeather(weatherObject.getString("main"));
-                            JSONObject mainObject = object.getJSONObject("main");
-                            String min = mainObject.getString("temp_min");
-                            Log.d("SetValues", min);
-                            mCity.setTemp_min(Double.valueOf(min));
-                            String max = mainObject.getString("temp_max");
-                            Log.d("SetValues", max);
-                            mCity.setTemp_max(Double.valueOf(max));
-                            String tempp = mainObject.getString("temp");
-                            Log.d("SetValues", tempp);
-                            mCity.setTemp(Double.valueOf(tempp));
-
-                            Log.d("TEST", mCity.getCityName());
-                            mCityHeader = (TextView) v.findViewById(R.id.city_header_name);
-                            mCityHeader.setText(mCity.getCityName());
-                            mWeatherStatus = (TextView) v.findViewById(R.id.weatherStatus);
-                            mWeatherStatus.setText(mCity.getWeather());
-                            Log.d("SeetingLAyout",mCity.getWeather());
-                            mMax = (TextView) v.findViewById(R.id.max);
-                            mMax.setText(Double.toString(mCity.getTemp_max()));
-                            Log.d("SeetingLAyout",Double.toString( mCity.getTemp_max()));
-                            mMin = (TextView) v.findViewById(R.id.min);
-                            mMin.setText(Double.toString(mCity.getTemp_min()));
-                            Log.d("SeetingLAyout",Double.toString( mCity.getTemp_min()));
-
-
-                        }catch(Exception ex){}
-                    }
-                },
-                new Response.ErrorListener()
-                {
-                    @Override
-                    public void onErrorResponse(VolleyError error)
-                    {
-                        // Deal with the error here
-                    }
-                });
-        NetworkSingleton.get(getActivity()).addRequest(jsonObjectRequest,"City View Header Current Date");
 
 
 
@@ -341,6 +282,19 @@ public class CityDetailFragment extends Fragment {
         mCurrentLocation = (TextView) v.findViewById(R.id.current_location);
         startLocationUpdates();
         getLastLocation();
+
+        mCityHeader = (TextView) v.findViewById(R.id.city_header_name);
+        mCityHeader.setText(mCity.getCityName());
+        mWeatherStatus = (TextView) v.findViewById(R.id.weatherStatus);
+        mWeatherStatus.setText(mCity.getWeather());
+        Log.d("SeetingLAyout",mCity.getWeather());
+        mMax = (TextView) v.findViewById(R.id.max);
+        mMax.setText(mCity.getTemp_max() + "" + (char) 0x00B0);
+        Log.d("SeetingLAyout",Double.toString( mCity.getTemp_max()));
+        mMin = (TextView) v.findViewById(R.id.min);
+        mMin.setText(mCity.getTemp_min() +  "" + (char) 0x00B0);
+        Log.d("SeetingLAyout",Double.toString( mCity.getTemp_min()));
+
         return v;
 
     }

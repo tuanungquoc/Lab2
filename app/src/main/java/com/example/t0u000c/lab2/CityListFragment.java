@@ -16,14 +16,22 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.*;
 
@@ -40,13 +48,83 @@ public class CityListFragment extends ListFragment {
         private static final int REQUEST_CITY = 1;
         private static final int REQUEST_CITY_DETAIL = 2;
         private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 3;
+
+        private class CityAdapter extends ArrayAdapter<City> {
+            public CityAdapter(ArrayList<City> cities) {
+                super(getActivity(), 0, cities);
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent){
+
+                if (convertView == null) {
+                    convertView = getActivity().getLayoutInflater()
+                            .inflate(R.layout.list_item_city, null);
+                }
+                // Configure the view for this Crime
+                City c = getItem(position);
+                TextView cityNameTextView =
+                        (TextView)convertView.findViewById(R.id.city_name_list_item);
+                cityNameTextView.setText(c.getCityName());
+
+                TextView cityTempTextView =
+                        (TextView)convertView.findViewById(R.id.city_list_item_temp);
+                cityTempTextView.setText(c.getTemp() +"" +  (char) 0x00B0);
+
+                return convertView;
+            }
+        }
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             getActivity().setTitle(R.string.app_name);
             setHasOptionsMenu(true);
             mCities = CityListSingleton.get(getActivity()).getmCities();
-            ArrayAdapter<City> adapter = new ArrayAdapter<City>(getActivity(),android.R.layout.simple_list_item_1,mCities);
+            //calling city weather to update
+            for(int i = 0 ; i < mCities.size(); i++){
+                final City mCity = mCities.get(i);
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
+                        Api.requestCityNow(mCity.getCityName() + "," + mCity.getIsoCountry()), new JSONObject(),
+                        new Response.Listener<JSONObject>()
+                        {
+                            @Override
+                            public void onResponse(JSONObject response)
+                            {
+                                try {
+                                    JSONObject object = new JSONObject(response.toString());
+
+                                    JSONArray weatherArray = object.getJSONArray("weather");
+                                    JSONObject weatherObject = weatherArray.getJSONObject(0);
+                                    Log.d("SetValues", weatherObject.getString("main"));
+                                    mCity.setWeather(weatherObject.getString("main"));
+                                    JSONObject mainObject = object.getJSONObject("main");
+                                    String min = mainObject.getString("temp_min");
+                                    Log.d("SetValues", min);
+                                    mCity.setTemp_min(Double.valueOf(min));
+                                    String max = mainObject.getString("temp_max");
+                                    Log.d("SetValues", max);
+                                    mCity.setTemp_max(Double.valueOf(max));
+                                    String tempp = mainObject.getString("temp");
+                                    Log.d("SetValues", tempp);
+                                    mCity.setTemp(Double.valueOf(tempp));
+                                    ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
+                                }catch(Exception ex){}
+                            }
+                        },
+                        new Response.ErrorListener()
+                        {
+                            @Override
+                            public void onErrorResponse(VolleyError error)
+                            {
+                                // Deal with the error here
+                            }
+                        });
+                NetworkSingleton.get(getActivity()).addRequest(jsonObjectRequest,"City View Header Current Date");
+
+            }
+           // ArrayAdapter<City> adapter = new ArrayAdapter<City>(getActivity(),android.R.layout.simple_list_item_1,mCities);
+            CityAdapter adapter = new CityAdapter(mCities);
             setListAdapter(adapter);
 
         }
@@ -153,7 +231,7 @@ public class CityListFragment extends ListFragment {
                     }
                     Log.i(TAG, "Place: " + cityName);
 
-                    City mCity = CityListSingleton.get(getActivity()).getmCities().get(CityListSingleton.get(getActivity()).getmCities().size()-1);
+                    final City mCity = CityListSingleton.get(getActivity()).getmCities().get(CityListSingleton.get(getActivity()).getmCities().size()-1);
                     int pos = CityListSingleton.get(getActivity()).getCityByName(cityName);
                     if (pos == -1) {
                         mCity.setCityName(cityName);
@@ -161,6 +239,45 @@ public class CityListFragment extends ListFragment {
                         mCity.setLon(lon);
                         mCity.setCountry(country);
                         mCity.setState(state);
+                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
+                                Api.requestCityNow(mCity.getCityName() + "," + mCity.getIsoCountry()), new JSONObject(),
+                                new Response.Listener<JSONObject>()
+                                {
+                                    @Override
+                                    public void onResponse(JSONObject response)
+                                    {
+                                        try {
+                                            String test = response.toString();
+                                            JSONObject object = new JSONObject(response.toString());
+
+                                            JSONArray weatherArray = object.getJSONArray("weather");
+                                            JSONObject weatherObject = weatherArray.getJSONObject(0);
+                                            Log.d("SetValues", weatherObject.getString("main"));
+                                            mCity.setWeather(weatherObject.getString("main"));
+                                            JSONObject mainObject = object.getJSONObject("main");
+                                            String min = mainObject.getString("temp_min");
+                                            Log.d("SetValues", min);
+                                            mCity.setTemp_min(Double.valueOf(min));
+                                            String max = mainObject.getString("temp_max");
+                                            Log.d("SetValues", max);
+                                            mCity.setTemp_max(Double.valueOf(max));
+                                            String tempp = mainObject.getString("temp");
+                                            Log.d("SetValues", tempp);
+                                            mCity.setTemp(Double.valueOf(tempp));
+                                            ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
+                                        }catch(Exception ex){}
+                                    }
+                                },
+                                new Response.ErrorListener()
+                                {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error)
+                                    {
+                                        // Deal with the error here
+                                    }
+                                });
+                        NetworkSingleton.get(getActivity()).addRequest(jsonObjectRequest,"City View Header Current Date");
+
 
                     } else {
                         CityListSingleton.get(getActivity()).getmCities().remove(CityListSingleton.get(getActivity()).getmCities().size() - 1);
@@ -178,7 +295,6 @@ public class CityListFragment extends ListFragment {
                     CityListSingleton.get(getActivity()).getmCities().remove(CityListSingleton.get(getActivity()).getmCities().size()-1);
                 }
                 ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
-
             }
         }
         @Override

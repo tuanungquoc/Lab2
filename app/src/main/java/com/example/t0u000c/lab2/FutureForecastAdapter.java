@@ -39,8 +39,8 @@ public class FutureForecastAdapter extends Adapter<FutureForecastAdapter.ViewHol
     @Override
     public void onBindViewHolder(FutureForecastAdapter.ViewHolder holder, int position) {
         holder.mFutureDay.setText(myDataSet.get(position).getDay());
-        holder.mMaxTemperature.setText(myDataSet.get(position).getmMaxTemp());
-        holder.mMinTemperature.setText(myDataSet.get(position).getmMinTemp());
+        holder.mMaxTemperature.setText(myDataSet.get(position).getmMaxTemp() +  "" + (char) 0x00B0);
+        holder.mMinTemperature.setText(myDataSet.get(position).getmMinTemp() +  "" + (char) 0x00B0);
         Picasso.with(context).load(myDataSet.get(position).getPhotoSrc()).into(holder.mDayTemperaturePhoto);
     }
 

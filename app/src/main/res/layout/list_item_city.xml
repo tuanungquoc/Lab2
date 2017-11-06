@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_alignParentRight="true"
+        android:id="@+id/city_list_item_temp"
+        android:text= "Temperature"
+        android:padding="5dp"
+        android:textSize="30dp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/city_list_item_temp"
+        android:textStyle="bold"
+        android:text="City Name"
+        android:id="@+id/city_name_list_item"
+        android:padding="5dp"
+        android:textSize="30dp"/>
+</RelativeLayout>

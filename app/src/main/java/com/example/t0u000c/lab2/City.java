@@ -22,6 +22,11 @@ public class City {
     private static final String JSON_LON = "lon";
     private static final String JSON_STATE = "state";
     private static final String JSON_COUNTRY  = "country";
+    private static final String JSON_WEATHER = "weather";
+    private static final String JSON_TEMP = "temp";
+    private static final String JSON_TEMPMIN = "tempMin";
+    private static final String JSON_TEMPMAX = "tempMax";
+
     private UUID mId;
     private String cityName =null;
 
@@ -95,6 +100,10 @@ public class City {
         lon = json.getDouble(JSON_LON);
         state = json.getString(JSON_STATE);
         country = json.getString(JSON_COUNTRY);
+        weather = json.getString(JSON_WEATHER);
+        temp = json.getDouble(JSON_TEMP);
+        temp_max = json.getDouble(JSON_TEMPMAX);
+        temp_min = json.getDouble(JSON_TEMPMIN);
 
     }
 
@@ -106,6 +115,10 @@ public class City {
         json.put(JSON_LON,lon);
         json.put(JSON_STATE,state);
         json.put(JSON_COUNTRY,country);
+        json.put(JSON_WEATHER,weather);
+        json.put(JSON_TEMP,temp);
+        json.put(JSON_TEMPMAX,temp_max);
+        json.put(JSON_TEMPMIN,temp_min);
         return json;
     }
 
