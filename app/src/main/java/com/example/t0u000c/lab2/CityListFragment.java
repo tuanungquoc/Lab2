@@ -1,10 +1,8 @@
 package com.example.t0u000c.lab2;
 
 import android.content.Intent;
-import android.os.Build;
 import android.support.v4.app.ListFragment;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -31,6 +29,7 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.*;
@@ -71,8 +70,88 @@ public class CityListFragment extends ListFragment {
                         (TextView)convertView.findViewById(R.id.city_list_item_temp);
                 cityTempTextView.setText(c.getTemp() +"" +  (char) 0x00B0);
 
+                TextView timeTextView =
+                        (TextView) convertView.findViewById(R.id.city_time_list_item);
+                timeTextView.setText(c.getCurrentTime());
                 return convertView;
             }
+        }
+
+
+        public void executeTimeRequest(final City mCity){
+            try {
+                JsonObjectRequest jsonObjectRequest1 = new JsonObjectRequest(Request.Method.GET,
+                        Api.requestTimeZoneData(mCity.getLat()+"",mCity.getLon()+""), new JSONObject(),
+                        new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                //Get and set local date of the city chosen.
+                                final JSONObject localzonedata;
+                                try {
+                                    localzonedata = new JSONObject(response.toString());
+                                    mCity.setCurrentTime(Api.getCurrentTime(localzonedata.getString("formatted")));
+                                    ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        },
+                        new Response.ErrorListener()
+                        {
+                            @Override
+                            public void onErrorResponse(VolleyError error)
+                            {
+                                executeTimeRequest(mCity);
+                            }
+                        });
+
+                NetworkSingleton.get(getActivity()).addRequest(jsonObjectRequest1,"Getting local time");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        public void executeTempRequest(final City mCity){
+            JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
+                    Api.requestCityNow(mCity.getCityName() + "," + mCity.getIsoCountry()), new JSONObject(),
+                    new Response.Listener<JSONObject>()
+                    {
+                        @Override
+                        public void onResponse(JSONObject response)
+                        {
+                            try {
+                                JSONObject object = new JSONObject(response.toString());
+
+                                JSONArray weatherArray = object.getJSONArray("weather");
+                                JSONObject weatherObject = weatherArray.getJSONObject(0);
+                                Log.d("SetValues", weatherObject.getString("main"));
+                                mCity.setWeather(weatherObject.getString("main"));
+                                JSONObject mainObject = object.getJSONObject("main");
+                                String min = mainObject.getString("temp_min");
+                                Log.d("SetValues", min);
+                                mCity.setTemp_min(Double.valueOf(min));
+                                String max = mainObject.getString("temp_max");
+                                Log.d("SetValues", max);
+                                mCity.setTemp_max(Double.valueOf(max));
+                                String tempp = mainObject.getString("temp");
+                                Log.d("SetValues", tempp);
+                                mCity.setTemp(Double.valueOf(tempp));
+                                ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
+                            }catch(Exception ex){}
+                        }
+                    },
+                    new Response.ErrorListener()
+                    {
+                        @Override
+                        public void onErrorResponse(VolleyError error)
+                        {
+                            //retry if it fails
+                            executeTempRequest(mCity);
+                        }
+                    });
+            NetworkSingleton.get(getActivity()).addRequest(jsonObjectRequest,"City View Header Current Date");
+
         }
 
         @Override
@@ -84,43 +163,8 @@ public class CityListFragment extends ListFragment {
             //calling city weather to update
             for(int i = 0 ; i < mCities.size(); i++){
                 final City mCity = mCities.get(i);
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
-                        Api.requestCityNow(mCity.getCityName() + "," + mCity.getIsoCountry()), new JSONObject(),
-                        new Response.Listener<JSONObject>()
-                        {
-                            @Override
-                            public void onResponse(JSONObject response)
-                            {
-                                try {
-                                    JSONObject object = new JSONObject(response.toString());
-
-                                    JSONArray weatherArray = object.getJSONArray("weather");
-                                    JSONObject weatherObject = weatherArray.getJSONObject(0);
-                                    Log.d("SetValues", weatherObject.getString("main"));
-                                    mCity.setWeather(weatherObject.getString("main"));
-                                    JSONObject mainObject = object.getJSONObject("main");
-                                    String min = mainObject.getString("temp_min");
-                                    Log.d("SetValues", min);
-                                    mCity.setTemp_min(Double.valueOf(min));
-                                    String max = mainObject.getString("temp_max");
-                                    Log.d("SetValues", max);
-                                    mCity.setTemp_max(Double.valueOf(max));
-                                    String tempp = mainObject.getString("temp");
-                                    Log.d("SetValues", tempp);
-                                    mCity.setTemp(Double.valueOf(tempp));
-                                    ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
-                                }catch(Exception ex){}
-                            }
-                        },
-                        new Response.ErrorListener()
-                        {
-                            @Override
-                            public void onErrorResponse(VolleyError error)
-                            {
-                                // Deal with the error here
-                            }
-                        });
-                NetworkSingleton.get(getActivity()).addRequest(jsonObjectRequest,"City View Header Current Date");
+                executeTempRequest(mCity);
+                executeTimeRequest(mCity);
 
             }
            // ArrayAdapter<City> adapter = new ArrayAdapter<City>(getActivity(),android.R.layout.simple_list_item_1,mCities);
@@ -277,6 +321,37 @@ public class CityListFragment extends ListFragment {
                                     }
                                 });
                         NetworkSingleton.get(getActivity()).addRequest(jsonObjectRequest,"City View Header Current Date");
+
+                        try {
+                            JsonObjectRequest jsonObjectRequest1 = new JsonObjectRequest(Request.Method.GET,
+                                    Api.requestTimeZoneData(mCity.getLat()+"",mCity.getLon()+""), new JSONObject(),
+                                    new Response.Listener<JSONObject>() {
+                                        @Override
+                                        public void onResponse(JSONObject response) {
+                                            //Get and set local date of the city chosen.
+                                            final JSONObject localzonedata;
+                                            try {
+                                                localzonedata = new JSONObject(response.toString());
+                                                mCity.setCurrentTime(Api.getCurrentTime(localzonedata.getString("formatted")));
+                                                ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    },
+                                    new Response.ErrorListener()
+                                    {
+                                        @Override
+                                        public void onErrorResponse(VolleyError error)
+                                        {
+                                            // Deal with the error here
+                                        }
+                                    });
+
+                            NetworkSingleton.get(getActivity()).addRequest(jsonObjectRequest1,"Getting local time");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
 
                     } else {

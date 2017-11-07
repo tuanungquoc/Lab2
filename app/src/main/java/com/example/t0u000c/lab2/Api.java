@@ -145,6 +145,14 @@ public class Api {
         DateFormat df=  new SimpleDateFormat("EEEE MMM d");
         return df.format(date);
     }
+
+    public static String getCurrentTime(String stringDate) throws ParseException {
+        SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat outFormat = new SimpleDateFormat("HH:mm");
+        String time24 = outFormat.format(inFormat.parse(stringDate));
+        return time24;
+    }
+
     public static String getNoon(int myNumber) {
         int[]numbers={0,3,6,9,12,15,18,21};
         int distance = Math.abs(numbers[0] - myNumber);

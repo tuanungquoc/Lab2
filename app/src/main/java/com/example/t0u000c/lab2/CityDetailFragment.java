@@ -99,6 +99,10 @@ public class CityDetailFragment extends Fragment {
 
     }
 
+
+
+
+
     public  void processCityViewTimeZone(final City city){
 
         JsonObjectRequest jsonObjectRequest = null;
@@ -115,6 +119,7 @@ public class CityDetailFragment extends Fragment {
                             final JSONObject localzonedata;
                             try {
                                 localzonedata = new JSONObject(response.toString());
+                                String test = Api.getCurrentTime(localzonedata.getString("formatted"));
                                 mToday.setText(Api.gettodayDate(localzonedata.getString("formatted")));
 
                                 SimpleDateFormat newDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -211,7 +216,7 @@ public class CityDetailFragment extends Fragment {
                                             @Override
                                             public void onErrorResponse(VolleyError error)
                                             {
-                                                // Deal with the error here
+
                                             }
                                         });
                                 NetworkSingleton.get(getActivity()).addRequest(jsonObjectRequest,"City View Header Current Date");
@@ -226,7 +231,7 @@ public class CityDetailFragment extends Fragment {
                         @Override
                         public void onErrorResponse(VolleyError error)
                         {
-                            // Deal with the error here
+                            processCityViewTimeZone(mCity);
                         }
                     });
         } catch (JSONException e) {

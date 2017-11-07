@@ -50,12 +50,14 @@ public class City {
     private String state;
     private String country;
 
+    private String currentTime;
 
     public  City(){
         mId = UUID.randomUUID();
         cityName = "";
         lat = lon = 0;
         country = "";
+        currentTime = "";
     }
 
     public String getState() {
@@ -174,4 +176,11 @@ public class City {
     }
 
 
+    public String getCurrentTime() {
+        return currentTime;
+    }
+
+    public void setCurrentTime(String currentTime) {
+        this.currentTime = currentTime;
+    }
 }
