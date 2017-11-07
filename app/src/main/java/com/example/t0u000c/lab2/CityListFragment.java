@@ -77,6 +77,21 @@ public class CityListFragment extends ListFragment {
             }
         }
 
+        @Override
+        public void onResume() {
+
+            super.onResume();
+            mCities = CityListSingleton.get(getActivity()).getmCities();
+            //calling city weather to update
+            for(int i = 0 ; i < mCities.size(); i++){
+                final City mCity = mCities.get(i);
+                executeTempRequest(mCity);
+                executeTimeRequest(mCity);
+
+            }
+            ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
+
+        }
 
         public void executeTimeRequest(final City mCity){
             try {
@@ -372,11 +387,7 @@ public class CityListFragment extends ListFragment {
                 ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
             }
         }
-        @Override
-        public void onResume() {
-            super.onResume();
-            ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
-        }
+       
 
 
 }
