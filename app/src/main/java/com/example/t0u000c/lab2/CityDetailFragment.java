@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -83,6 +84,8 @@ public class CityDetailFragment extends Fragment {
     private static int INTERVAL_UPDATE = 10000;
     private static int FASTEST_INTERVAL = 2000;
 
+    private String[] hourData = new String[8];
+    private Date localtime= null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -123,7 +126,7 @@ public class CityDetailFragment extends Fragment {
                                 mToday.setText(Api.gettodayDate(localzonedata.getString("formatted")));
 
                                 SimpleDateFormat newDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                Date localtime= newDateFormat.parse(localzonedata.getString("formatted"));
+                                localtime= newDateFormat.parse(localzonedata.getString("formatted"));
                                 //w.localtimetoUTCunix=con.getUrlData(Api.convertLocalToUTC(object2.getString("zoneName"),newDateFormat.format(localtime)));
 
 
@@ -150,6 +153,9 @@ public class CityDetailFragment extends Fragment {
 
                                                     JSONArray fiveDaysArray = fiveDays.getJSONArray("list");
                                                     Log.d("FIVE DARYS", String.valueOf(fiveDaysArray));
+
+                                                    dailyForecastDataset = new ArrayList<String>();
+
                                                     futureForecastDataset = new ArrayList<DayForecast>();
                                                     SimpleDateFormat newDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                                     Date today = null;
@@ -160,6 +166,17 @@ public class CityDetailFragment extends Fragment {
                                                         e.printStackTrace();
                                                     }
                                                     int counter5days=0;
+
+                                                    String UTCnowdatestring = Api.utcToDate(localtimetoUTCunix,"Antarctica/Troll");
+                                                    Date UTCnowdate = newDateFormat.parse(UTCnowdatestring);
+                                                    Calendar calendar = Calendar.getInstance(); // creates a new calendar instance
+                                                    calendar.setTime(UTCnowdate);   // assigns calendar to given date
+                                                    float UTCnowdatehour= calendar.get(Calendar.HOUR_OF_DAY);
+                                                    UTCnowdatehour+=calendar.get(Calendar.MINUTE)/60;
+                                                    Log.d("UTC NOW HOUR",String.valueOf(UTCnowdatehour) );
+                                                    String UTCnowhourmatch = Api.getMatch(UTCnowdatehour);
+                                                    Log.d("UTC NOW HOUR MATCH",String.valueOf(UTCnowhourmatch) );
+
 
                                                     String localtoUTCincrementedstring =Api.utcToDate(tomorrowlocaldatetoUTCunix, "Antarctica/Troll");
                                                     Date localtoUTCincrementeddate= newDateFormat.parse(localtoUTCincrementedstring);
@@ -172,13 +189,19 @@ public class CityDetailFragment extends Fragment {
                                                     Date localtoUTCincrementednoon= newDateFormat.parse(localtoUTCincrementednoonstring);
                                                     newDateFormat.applyPattern("HH");
                                                     int localToUTCnoon= Integer.parseInt(newDateFormat.format(localtoUTCincrementednoon));
-                                                    String localToUTCnoonmatch = Api.getNoon(localToUTCnoon);
+                                                    String localToUTCnoonmatch = Api.getMatch(localToUTCnoon);
                                                     Log.d("Matched Noon:",localToUTCnoonmatch );
+                                                    //Date localtime= newDateFormat.parse(localzonedata.getString("formatted"));
+                                                    int localtimeHR= Integer.parseInt(newDateFormat.format(localtime));
+                                                    Log.d("LOCAL TIME HR:",String.valueOf(localtimeHR));
+                                                    int temp =localtimeHR;
+                                                    int counter24hours =0;
                                                     for(int i = 0 ; i < fiveDaysArray.length() ; i++){
                                                         SimpleDateFormat newdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
                                                         try {
                                                             Log.d(String.valueOf(i), fiveDaysArray.getJSONObject(i).getString("dt_txt"));
+                                                            long weatherdatenowunix = Long.parseLong(fiveDaysArray.getJSONObject(i).getString("dt"));
                                                             Date MyDate = newdf.parse(fiveDaysArray.getJSONObject(i).getString("dt_txt"));
                                                             Log.d("MYYDAte:", String.valueOf(MyDate));
                                                             newdf.applyPattern("HH");
@@ -186,6 +209,23 @@ public class CityDetailFragment extends Fragment {
 
                                                             Log.d("formating mydate", hr);
                                                             Log.d("is match true?", String.valueOf(MyDate.after(localtoUTCincrementeddate)));
+
+                                                            if((weatherdatenowunix > localtimetoUTCunix) && counter24hours <9 && ((Integer.parseInt(hr) >= Integer.parseInt(UTCnowhourmatch)) || counter24hours>1 )){
+                                                                Log.d("INSIDE HOURLY", fiveDaysArray.getJSONObject(i).getString("dt_txt" ));
+
+                                                                if(counter24hours ==0){
+                                                                    dailyForecastDataset.add("NOW "+ fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("main")+ fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp")) ;
+                                                                }else{
+                                                                    temp=temp+3;
+                                                                    if(temp>=24){
+                                                                        temp-=24;
+                                                                    }
+                                                                    dailyForecastDataset.add(String.valueOf(temp)+" "+ fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("main")+ fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp")) ;
+
+                                                                }
+                                                                Log.d("coubnter24hr:", String.valueOf(counter24hours));
+                                                                counter24hours++;
+                                                            }
 
                                                             if((hr.equals(localToUTCnoonmatch) && MyDate.after(localtoUTCincrementeddate))|| ((i== fiveDaysArray.length()-1) && counter5days==4)) {
                                                                 Log.d("DAte:", String.valueOf(MyDate));
@@ -203,6 +243,9 @@ public class CityDetailFragment extends Fragment {
                                                         }
 
                                                     }
+
+                                                    mDailyForecastAdapter = new DailyForecastAdapter(dailyForecastDataset);
+                                                    mDailyForecastView.setAdapter(mDailyForecastAdapter);
                                                     // specify an adapter (see also next example)
                                                     mFutureForecastAdapter = new FutureForecastAdapter(getActivity(),futureForecastDataset);
                                                     mFutureForecastView.setAdapter(mFutureForecastAdapter);
@@ -267,12 +310,7 @@ public class CityDetailFragment extends Fragment {
         // use a linear layout manager
         mDailyForecastLayoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false);
         mDailyForecastView.setLayoutManager(mDailyForecastLayoutManager);
-        dailyForecastDataset = new ArrayList<String>();
-        for(int i = 0 ; i < 24 ; i++){
-            dailyForecastDataset.add( i + " HOUR") ;
-        }
-        mDailyForecastAdapter = new DailyForecastAdapter(dailyForecastDataset);
-        mDailyForecastView.setAdapter(mDailyForecastAdapter);
+
 
         /**
          * Future forecast

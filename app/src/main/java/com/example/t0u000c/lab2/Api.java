@@ -153,13 +153,13 @@ public class Api {
         return time24;
     }
 
-    public static String getNoon(int myNumber) {
+    public static String getMatch(float myNumber) {
         int[]numbers={0,3,6,9,12,15,18,21};
-        int distance = Math.abs(numbers[0] - myNumber);
+        float distance = Math.abs(numbers[0] - myNumber);
         int idx = 0;
         for(int c = 1; c < numbers.length; c++){
-            int cdistance = Math.abs(numbers[c] - myNumber);
-            if(cdistance < distance){
+            float cdistance = Math.abs(numbers[c] - myNumber);
+            if(cdistance <= distance){
                 idx = c;
                 distance = cdistance;
             }
