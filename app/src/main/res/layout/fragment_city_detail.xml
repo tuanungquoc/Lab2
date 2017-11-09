@@ -3,14 +3,15 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <TextView
+        android:id="@+id/city_header_name"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:textSize="30sp"
-        android:layout_margin="10dp"
+        android:layout_height="50dp"
         android:layout_centerInParent="true"
+        android:layout_margin="10dp"
         android:gravity="center"
-        android:id="@+id/city_header_name" />
+        android:textSize="30sp" />
     <TextView
         android:layout_width="match_parent"
         android:layout_height="30dp"

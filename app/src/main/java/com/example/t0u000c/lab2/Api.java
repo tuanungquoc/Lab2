@@ -154,7 +154,7 @@ public class Api {
     }
 
     public static String getMatch(float myNumber) {
-        int[]numbers={0,3,6,9,12,15,18,21};
+        int[]numbers={0,3,6,9,12,15,18,21,24};
         float distance = Math.abs(numbers[0] - myNumber);
         int idx = 0;
         for(int c = 1; c < numbers.length; c++){
@@ -164,8 +164,13 @@ public class Api {
                 distance = cdistance;
             }
         }
-        Log.d("UTC of local Noon", String.valueOf(numbers[idx]));
-        return String.valueOf(numbers[idx]);
+        Log.d("UTC MATCH", String.valueOf(numbers[idx]));
+        if (idx == 8){
+            return String.valueOf(0);
+        }else{
+            return String.valueOf(numbers[idx]);
+        }
+
     }
 }
 

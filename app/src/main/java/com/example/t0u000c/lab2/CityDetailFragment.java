@@ -124,7 +124,7 @@ public class CityDetailFragment extends Fragment {
                                 localzonedata = new JSONObject(response.toString());
                                 String test = Api.getCurrentTime(localzonedata.getString("formatted"));
                                 mToday.setText(Api.gettodayDate(localzonedata.getString("formatted")));
-
+                                city.setIsoCountry(localzonedata.getString("countryCode"));
                                 SimpleDateFormat newDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                 localtime= newDateFormat.parse(localzonedata.getString("formatted"));
                                 //w.localtimetoUTCunix=con.getUrlData(Api.convertLocalToUTC(object2.getString("zoneName"),newDateFormat.format(localtime)));
@@ -155,6 +155,7 @@ public class CityDetailFragment extends Fragment {
                                                     Log.d("FIVE DARYS", String.valueOf(fiveDaysArray));
 
                                                     dailyForecastDataset = new ArrayList<String>();
+                                                    dailyForecastDataset.add( "Now"+System.getProperty("line.separator")+ mCity.getWeather()+System.getProperty("line.separator")+ mCity.getTemp()) ;
 
                                                     futureForecastDataset = new ArrayList<DayForecast>();
                                                     SimpleDateFormat newDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -172,7 +173,8 @@ public class CityDetailFragment extends Fragment {
                                                     Calendar calendar = Calendar.getInstance(); // creates a new calendar instance
                                                     calendar.setTime(UTCnowdate);   // assigns calendar to given date
                                                     float UTCnowdatehour= calendar.get(Calendar.HOUR_OF_DAY);
-                                                    UTCnowdatehour+=calendar.get(Calendar.MINUTE)/60;
+                                                    Log.d("UTC MINUTES NOW:",String.valueOf(calendar.get(Calendar.MINUTE)));
+                                                    UTCnowdatehour=UTCnowdatehour+(calendar.get(Calendar.MINUTE)/60.0f);
                                                     Log.d("UTC NOW HOUR",String.valueOf(UTCnowdatehour) );
                                                     String UTCnowhourmatch = Api.getMatch(UTCnowdatehour);
                                                     Log.d("UTC NOW HOUR MATCH",String.valueOf(UTCnowhourmatch) );
@@ -210,17 +212,25 @@ public class CityDetailFragment extends Fragment {
                                                             Log.d("formating mydate", hr);
                                                             Log.d("is match true?", String.valueOf(MyDate.after(localtoUTCincrementeddate)));
 
-                                                            if((weatherdatenowunix > localtimetoUTCunix) && counter24hours <9 && ((Integer.parseInt(hr) >= Integer.parseInt(UTCnowhourmatch)) || counter24hours>1 )){
+                                                            if((weatherdatenowunix > localtimetoUTCunix) && counter24hours <8 ){
                                                                 Log.d("INSIDE HOURLY", fiveDaysArray.getJSONObject(i).getString("dt_txt" ));
 
-                                                                if(counter24hours ==0){
-                                                                    dailyForecastDataset.add("NOW "+ fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("main")+ fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp")) ;
+                                                                if(counter24hours ==0 && (Integer.parseInt(hr) == Integer.parseInt(UTCnowhourmatch))){
+                                                                    dailyForecastDataset.set(counter24hours,"Now"+ System.getProperty("line.separator")+ fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("main")+System.getProperty("line.separator")+ fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp")) ;
+                                                                    counter24hours--;
                                                                 }else{
                                                                     temp=temp+3;
                                                                     if(temp>=24){
                                                                         temp-=24;
                                                                     }
-                                                                    dailyForecastDataset.add(String.valueOf(temp)+" "+ fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("main")+ fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp")) ;
+                                                                    String ampm= null;
+                                                                    if(temp==12)
+                                                                        ampm="Noon";
+                                                                    else if(temp<12)
+                                                                        ampm=temp+"AM";
+                                                                    else
+                                                                        ampm=temp+"PM";
+                                                                    dailyForecastDataset.add(ampm+System.getProperty("line.separator")+ fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("main")+System.getProperty("line.separator")+ fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp")) ;
 
                                                                 }
                                                                 Log.d("coubnter24hr:", String.valueOf(counter24hours));

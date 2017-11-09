@@ -105,6 +105,7 @@ public class CityListFragment extends ListFragment {
                                 try {
                                     localzonedata = new JSONObject(response.toString());
                                     mCity.setCurrentTime(Api.getCurrentTime(localzonedata.getString("formatted")));
+                                    mCity.setIsoCountry(localzonedata.getString("countryCode"));
                                     ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -348,6 +349,7 @@ public class CityListFragment extends ListFragment {
                                             try {
                                                 localzonedata = new JSONObject(response.toString());
                                                 mCity.setCurrentTime(Api.getCurrentTime(localzonedata.getString("formatted")));
+                                                mCity.setIsoCountry(localzonedata.getString("countryCode"));
                                                 ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
                                             } catch (Exception e) {
                                                 e.printStackTrace();
