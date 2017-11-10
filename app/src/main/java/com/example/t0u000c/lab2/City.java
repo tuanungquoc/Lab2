@@ -26,19 +26,13 @@ public class City {
     private static final String JSON_TEMP = "temp";
     private static final String JSON_TEMPMIN = "tempMin";
     private static final String JSON_TEMPMAX = "tempMax";
-
+    private static final String JSON_ZONETIME = "zoneTime";
+    private static final String JSON_ISOCOUNTRY = "isoCountry";
     private UUID mId;
     private String cityName =null;
 
-    public String getIsoCountry() {
-        return isoCountry;
-    }
 
-    public void setIsoCountry(String isoCountry) {
-        this.isoCountry = isoCountry;
-    }
-
-    private String isoCountry ="US";
+    private String isoCountry;
     private String weather;
     private double temp;
     private double temp_min;
@@ -51,6 +45,7 @@ public class City {
     private String country;
 
     private String currentTime;
+    private String zoneTime;
 
     public  City(){
         mId = UUID.randomUUID();
@@ -58,6 +53,17 @@ public class City {
         lat = lon = 0;
         country = "";
         currentTime = "";
+        zoneTime = "";
+        isoCountry = "";
+
+    }
+
+    public String getIsoCountry() {
+        return isoCountry;
+    }
+
+    public void setIsoCountry(String isoCountry) {
+        this.isoCountry = isoCountry;
     }
 
     public String getState() {
@@ -106,7 +112,8 @@ public class City {
         temp = json.getDouble(JSON_TEMP);
         temp_max = json.getDouble(JSON_TEMPMAX);
         temp_min = json.getDouble(JSON_TEMPMIN);
-
+        zoneTime = json.getString(JSON_ZONETIME);
+        isoCountry = json.getString(JSON_ISOCOUNTRY);
     }
 
     public JSONObject toJSON() throws JSONException {
@@ -121,6 +128,8 @@ public class City {
         json.put(JSON_TEMP,temp);
         json.put(JSON_TEMPMAX,temp_max);
         json.put(JSON_TEMPMIN,temp_min);
+        json.put(JSON_ZONETIME,zoneTime);
+        json.put(JSON_ISOCOUNTRY,isoCountry);
         return json;
     }
 
@@ -182,5 +191,12 @@ public class City {
 
     public void setCurrentTime(String currentTime) {
         this.currentTime = currentTime;
+    }
+    public String getZoneTime() {
+        return zoneTime;
+    }
+
+    public void setZoneTime(String zoneTime) {
+        this.zoneTime = zoneTime;
     }
 }

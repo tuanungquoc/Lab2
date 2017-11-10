@@ -38,6 +38,12 @@
                 android:value=".CityListActivity"/>
         </activity>
 
+        <activity android:name=".SettingActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden">
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                android:value=".CityListActivity"/>
+        </activity>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDk2E3HXK8mAs6WGp7GYxRE7TYOQN1bmnw"/>

@@ -32,6 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.util.*;
 
 import static android.app.Activity.RESULT_CANCELED;
@@ -45,6 +46,7 @@ public class CityListFragment extends ListFragment {
         private ArrayList<City> mCities;
         private static final String TAG = "CityListFragment";
         private static final int REQUEST_CITY = 1;
+        private static final int REQUEST_SETTING = 4;
         private static final int REQUEST_CITY_DETAIL = 2;
         private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 3;
 
@@ -68,7 +70,10 @@ public class CityListFragment extends ListFragment {
 
                 TextView cityTempTextView =
                         (TextView)convertView.findViewById(R.id.city_list_item_temp);
-                cityTempTextView.setText(c.getTemp() +"" +  (char) 0x00B0);
+                if(!CityListSingleton.get(getActivity()).isDegreeCelcius())
+                    cityTempTextView.setText(c.getTemp() +"" +  (char) 0x00B0);
+                else
+                    cityTempTextView.setText(Api.getFarenheit(c.getTemp())+"" +  (char) 0x00B0);
 
                 TextView timeTextView =
                         (TextView) convertView.findViewById(R.id.city_time_list_item);
@@ -94,35 +99,41 @@ public class CityListFragment extends ListFragment {
         }
 
         public void executeTimeRequest(final City mCity){
-            try {
-                JsonObjectRequest jsonObjectRequest1 = new JsonObjectRequest(Request.Method.GET,
-                        Api.requestTimeZoneData(mCity.getLat()+"",mCity.getLon()+""), new JSONObject(),
-                        new Response.Listener<JSONObject>() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                //Get and set local date of the city chosen.
-                                final JSONObject localzonedata;
-                                try {
-                                    localzonedata = new JSONObject(response.toString());
-                                    mCity.setCurrentTime(Api.getCurrentTime(localzonedata.getString("formatted")));
-                                    mCity.setIsoCountry(localzonedata.getString("countryCode"));
-                                    ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        },
-                        new Response.ErrorListener()
-                        {
-                            @Override
-                            public void onErrorResponse(VolleyError error)
-                            {
-                                executeTimeRequest(mCity);
-                            }
-                        });
+//            try {
+//                JsonObjectRequest jsonObjectRequest1 = new JsonObjectRequest(Request.Method.GET,
+//                        Api.requestTimeZoneData(mCity.getLat()+"",mCity.getLon()+""), new JSONObject(),
+//                        new Response.Listener<JSONObject>() {
+//                            @Override
+//                            public void onResponse(JSONObject response) {
+//                                //Get and set local date of the city chosen.
+//                                final JSONObject localzonedata;
+//                                try {
+//                                    localzonedata = new JSONObject(response.toString());
+//                                    mCity.setCurrentTime(Api.getCurrentTime(localzonedata.getString("formatted")));
+//                                    mCity.setIsoCountry(localzonedata.getString("countryCode"));
+//                                    ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                        },
+//                        new Response.ErrorListener()
+//                        {
+//                            @Override
+//                            public void onErrorResponse(VolleyError error)
+//                            {
+//                                executeTimeRequest(mCity);
+//                            }
+//                        });
+//
+//                NetworkSingleton.get(getActivity()).addRequest(jsonObjectRequest1,"Getting local time");
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
 
-                NetworkSingleton.get(getActivity()).addRequest(jsonObjectRequest1,"Getting local time");
-            } catch (JSONException e) {
+            try {
+                mCity.setCurrentTime(Api.getCurrentTime1(mCity.getZoneTime()));
+            } catch (ParseException e) {
                 e.printStackTrace();
             }
 
@@ -268,6 +279,10 @@ public class CityListFragment extends ListFragment {
                         // TODO: Handle the error.
                     }
                     return true;
+                case R.id.menu_item_setting:
+                    Intent i = new Intent(getActivity(), SettingActivity.class);
+                    startActivityForResult(i, REQUEST_SETTING);
+                    return true;
                 default:
                     return super.onOptionsItemSelected(item);
             }
@@ -298,6 +313,7 @@ public class CityListFragment extends ListFragment {
                         mCity.setLat(lat);
                         mCity.setLon(lon);
                         mCity.setCountry(country);
+                        mCity.setIsoCountry(country);
                         mCity.setState(state);
                         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
                                 Api.requestCityNow(mCity.getCityName() + "," + mCity.getIsoCountry()), new JSONObject(),
@@ -348,8 +364,9 @@ public class CityListFragment extends ListFragment {
                                             final JSONObject localzonedata;
                                             try {
                                                 localzonedata = new JSONObject(response.toString());
-                                                mCity.setCurrentTime(Api.getCurrentTime(localzonedata.getString("formatted")));
+                                                mCity.setZoneTime(localzonedata.getString("zoneName"));
                                                 mCity.setIsoCountry(localzonedata.getString("countryCode"));
+                                                mCity.setCurrentTime(Api.getCurrentTime1(mCity.getZoneTime()));
                                                 ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
                                             } catch (Exception e) {
                                                 e.printStackTrace();

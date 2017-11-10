@@ -97,9 +97,6 @@ public class CityDetailFragment extends Fragment {
             processCityViewTimeZone(mCity);
 
         }
-
-
-
     }
 
 
@@ -155,7 +152,9 @@ public class CityDetailFragment extends Fragment {
                                                     Log.d("FIVE DARYS", String.valueOf(fiveDaysArray));
 
                                                     dailyForecastDataset = new ArrayList<String>();
-                                                    dailyForecastDataset.add( "Now"+System.getProperty("line.separator")+ mCity.getWeather()+System.getProperty("line.separator")+ mCity.getTemp()) ;
+                                                    dailyForecastDataset.add( "Now"+System.getProperty("line.separator")+ mCity.getWeather()+System.getProperty("line.separator")+
+                                                            (CityListSingleton.get(getActivity()).isDegreeCelcius() ? Api.getFarenheit(mCity.getTemp()) : mCity.getTemp()));
+
 
                                                     futureForecastDataset = new ArrayList<DayForecast>();
                                                     SimpleDateFormat newDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -216,8 +215,9 @@ public class CityDetailFragment extends Fragment {
                                                                 Log.d("INSIDE HOURLY", fiveDaysArray.getJSONObject(i).getString("dt_txt" ));
 
                                                                 if(counter24hours ==0 && (Integer.parseInt(hr) == Integer.parseInt(UTCnowhourmatch))){
-                                                                    dailyForecastDataset.set(counter24hours,"Now"+ System.getProperty("line.separator")+ fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("main")+System.getProperty("line.separator")+ fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp")) ;
-                                                                    counter24hours--;
+                                                                    dailyForecastDataset.set(counter24hours,"Now"+ System.getProperty("line.separator")+ fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("main")+System.getProperty("line.separator")+
+                                                                            (CityListSingleton.get(getActivity()).isDegreeCelcius() ? Api.getFarenheit( Double.parseDouble(fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp"))) :
+                                                                                    Double.parseDouble(fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp"))));                                                                    counter24hours--;
                                                                 }else{
                                                                     temp=temp+3;
                                                                     if(temp>=24){
@@ -230,7 +230,11 @@ public class CityDetailFragment extends Fragment {
                                                                         ampm=temp+"AM";
                                                                     else
                                                                         ampm=temp+"PM";
-                                                                    dailyForecastDataset.add(ampm+System.getProperty("line.separator")+ fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("main")+System.getProperty("line.separator")+ fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp")) ;
+                                                                    dailyForecastDataset.add(ampm+System.getProperty("line.separator")+ fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("main")+System.getProperty("line.separator")+
+                                                                            (CityListSingleton.get(getActivity()).isDegreeCelcius() ? Api.getFarenheit( Double.parseDouble(fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp"))) :
+                                                                                    Double.parseDouble(fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp"))));
+
+                                                                    ;
 
                                                                 }
                                                                 Log.d("coubnter24hr:", String.valueOf(counter24hours));
@@ -241,8 +245,11 @@ public class CityDetailFragment extends Fragment {
                                                                 Log.d("DAte:", String.valueOf(MyDate));
                                                                 newdf.applyPattern("EEE");
                                                                 DayForecast dayForecast = new DayForecast(newdf.format(MyDate),
-                                                                        fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp_max"),
-                                                                        fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp_min"),
+
+                                                                        CityListSingleton.get(getActivity()).isDegreeCelcius() ? Api.getFarenheit( Double.parseDouble(fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp_max"))) +"":
+                                                                                fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp_max"),
+                                                                        CityListSingleton.get(getActivity()).isDegreeCelcius() ? Api.getFarenheit( Double.parseDouble(fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp_min"))) +"":
+                                                                                fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp_min"),
                                                                         fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("icon"));
                                                                 futureForecastDataset.add(dayForecast);
                                                                 counter5days++;

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 public class CityListSingleton {
     private ArrayList<City> mCities;
-
+    private boolean degreeCelcius;
     private static CityListSingleton cityListSingleton;
     private Context mContext;
 
@@ -25,6 +25,7 @@ public class CityListSingleton {
 
     private CityListSingleton(Context context){
         this.mContext = context;
+        this.degreeCelcius = false;
         mSerializer = new CityIntentJSONSerializer(mContext, FILENAME)  ;
         try {
             mCities = mSerializer.loadCities();
@@ -85,5 +86,13 @@ public class CityListSingleton {
             i++;
         }
         return -1;
+    }
+
+    public boolean isDegreeCelcius() {
+        return degreeCelcius;
+    }
+
+    public void setDegreeCelcius(boolean degreeCelcius) {
+        this.degreeCelcius = degreeCelcius;
     }
 }

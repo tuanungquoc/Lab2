@@ -1,8 +1,8 @@
 package com.example.t0u000c.lab2;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -21,7 +21,7 @@ public class CityAddActivity extends SingleFragmentActivity implements GoogleApi
     private GoogleApiClient mGoogleApiClient;
 
     @Override
-    protected Fragment createFragment() {
+    protected android.support.v4.app.Fragment createFragment() {
         UUID cityId = (UUID) getIntent().getSerializableExtra(CityAddFragment.EXTRA_CITY_ID);
         return CityAddFragment.newInstance(cityId);
 

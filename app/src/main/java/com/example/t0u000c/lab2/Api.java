@@ -12,6 +12,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import static java.lang.Math.round;
+
 /**
  * Created by VimmiSwami on 10/23/2017.
  */
@@ -19,7 +21,7 @@ import java.util.TimeZone;
 public class Api {
 
 
-    public static String key= "4d24bc6be2371dad87666ac843e640ad";
+    public static String key= "ac0b419a5c23e4909e174e473bc4a03c";
     public static String linkNow= "http://api.openweathermap.org/data/2.5/weather";
     public static String linkForecastHourly= "http://api.openweathermap.org/data/2.5/forecast";
     public static String linkForecastDays= "http://api.openweathermap.org/data/2.5/forecast/daily";
@@ -153,6 +155,21 @@ public class Api {
         return time24;
     }
 
+    public static String getCurrentTime1(String timeZone) throws ParseException {
+        //Convert to current time based on the time zone
+        Date date = new Date();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a");
+        TimeZone tz = TimeZone.getTimeZone(timeZone);
+        sdf.setTimeZone(tz);
+
+        String sDateInAmerica = sdf.format(date); // Convert to String first
+        SimpleDateFormat inFormat = new SimpleDateFormat("dd-m-yyyy hh:mm:ss a");
+        SimpleDateFormat outFormat = new SimpleDateFormat("hh:mm a");
+        String time24 = outFormat.format(inFormat.parse(sDateInAmerica));
+        return time24;
+    }
+
     public static String getMatch(float myNumber) {
         int[]numbers={0,3,6,9,12,15,18,21,24};
         float distance = Math.abs(numbers[0] - myNumber);
@@ -171,6 +188,14 @@ public class Api {
             return String.valueOf(numbers[idx]);
         }
 
+    }
+
+    public static double getFarenheit(double celcius){
+        return round((9.0/5.0)*celcius + 32);
+    }
+
+    public static double getCelcius(double farenheit){
+        return (5.0/9.0)*(farenheit - 32);
     }
 }
 
