@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fillViewport="true"
+    android:scrollbars = "vertical"
+    android:scrollbarStyle="insideInset"
+    >
+<LinearLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -9,61 +17,72 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_centerInParent="true"
-        android:layout_margin="10dp"
+        android:layout_margin="5dp"
         android:gravity="center"
-        android:textSize="30sp" />
+        android:text="Sunnyvale"
+        android:textColor="@color/cast_intro_overlay_button_background_color"
+        android:textSize="40sp" />
+
     <TextView
+        android:id="@+id/current_location"
         android:layout_width="match_parent"
         android:layout_height="30dp"
-        android:textSize="15sp"
-        android:layout_margin="10dp"
         android:layout_centerInParent="true"
+        android:layout_margin="2dp"
         android:gravity="center"
-        android:id="@+id/current_location" />
+        android:textColor="@color/cast_intro_overlay_button_background_color"
+        android:textSize="25sp"
+        tools:text="Sunyvale" />
     <TextView
         android:id="@+id/today"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:text=""
+        android:textColor="@color/cast_intro_overlay_button_background_color"
         android:textAlignment="center"
-        android:textSize="15sp" />
+        android:textSize="20sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal"
         android:gravity="center">
+
         <TextView
             android:id="@+id/weatherStatus"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_margin="10dp"
-            android:text="Sunny"
+            android:layout_margin="5dp"
             android:layout_weight="2"
-            android:textAlignment="center"
-            android:textSize="20sp" />
+            android:text="Sunny"
+            android:gravity="center"
+            android:textColor="@color/cast_intro_overlay_button_background_color"
+            android:textSize="25sp" />
 
         <TextView
             android:id="@+id/max"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_margin="10dp"
+            android:layout_margin="5dp"
             android:layout_weight="0.5"
             android:text="30"
             android:gravity="center_vertical|right|end"
-            android:textSize="15sp"
+            android:textColor="@color/cast_intro_overlay_button_background_color"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/min"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_margin="10dp"
+            android:layout_margin="5dp"
             android:layout_weight="0.5"
             android:text="15"
+            android:fontFamily="sans-serif-light"
             android:gravity="center_vertical|left|start"
-            android:textSize="15sp"
+            android:textSize="20sp"
+            android:textColor="@color/cast_intro_overlay_button_background_color"
             android:visibility="visible" />
     </LinearLayout>
 
@@ -92,3 +111,4 @@
         android:layout_height="match_parent" />
 
 </LinearLayout>
+    </ScrollView>

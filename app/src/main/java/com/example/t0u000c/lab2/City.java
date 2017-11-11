@@ -46,6 +46,7 @@ public class City {
 
     private String currentTime;
     private String zoneTime;
+    private String icon;
 
     public  City(){
         mId = UUID.randomUUID();
@@ -99,7 +100,13 @@ public class City {
         this.lat = lat;
     }
 
+    public String getIcon() {
+        return icon;
+    }
 
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
 
     public City(JSONObject json) throws JSONException {
         mId = UUID.fromString(json.getString(JSON_ID));

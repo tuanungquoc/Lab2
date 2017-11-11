@@ -164,6 +164,7 @@ public class CityListFragment extends ListFragment {
                                 String tempp = mainObject.getString("temp");
                                 Log.d("SetValues", tempp);
                                 mCity.setTemp(Double.valueOf(tempp));
+                                mCity.setIcon(weatherObject.getString("icon"));
                                 ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
                             }catch(Exception ex){}
                         }
@@ -296,6 +297,7 @@ public class CityListFragment extends ListFragment {
                     double lat = place.getLatLng().latitude;
                     double lon = place.getLatLng().longitude;
                     String[] address = (place.getAddress()+"").split(",");
+                    Log.d("In autocomple", address[0]+","+address[1]+","+address[2]);
                     String country = "";
                     String state = "";
                     if(address.length == 2){
@@ -313,47 +315,8 @@ public class CityListFragment extends ListFragment {
                         mCity.setLat(lat);
                         mCity.setLon(lon);
                         mCity.setCountry(country);
-                        mCity.setIsoCountry(country);
+                        //mCity.setIsoCountry(country);
                         mCity.setState(state);
-                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
-                                Api.requestCityNow(mCity.getCityName() + "," + mCity.getIsoCountry()), new JSONObject(),
-                                new Response.Listener<JSONObject>()
-                                {
-                                    @Override
-                                    public void onResponse(JSONObject response)
-                                    {
-                                        try {
-                                            String test = response.toString();
-                                            JSONObject object = new JSONObject(response.toString());
-
-                                            JSONArray weatherArray = object.getJSONArray("weather");
-                                            JSONObject weatherObject = weatherArray.getJSONObject(0);
-                                            Log.d("SetValues", weatherObject.getString("main"));
-                                            mCity.setWeather(weatherObject.getString("main"));
-                                            JSONObject mainObject = object.getJSONObject("main");
-                                            String min = mainObject.getString("temp_min");
-                                            Log.d("SetValues", min);
-                                            mCity.setTemp_min(Double.valueOf(min));
-                                            String max = mainObject.getString("temp_max");
-                                            Log.d("SetValues", max);
-                                            mCity.setTemp_max(Double.valueOf(max));
-                                            String tempp = mainObject.getString("temp");
-                                            Log.d("SetValues", tempp);
-                                            mCity.setTemp(Double.valueOf(tempp));
-                                            ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
-                                        }catch(Exception ex){}
-                                    }
-                                },
-                                new Response.ErrorListener()
-                                {
-                                    @Override
-                                    public void onErrorResponse(VolleyError error)
-                                    {
-                                        // Deal with the error here
-                                    }
-                                });
-                        NetworkSingleton.get(getActivity()).addRequest(jsonObjectRequest,"City View Header Current Date");
-
                         try {
                             JsonObjectRequest jsonObjectRequest1 = new JsonObjectRequest(Request.Method.GET,
                                     Api.requestTimeZoneData(mCity.getLat()+"",mCity.getLon()+""), new JSONObject(),
@@ -386,6 +349,47 @@ public class CityListFragment extends ListFragment {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET,
+                                Api.requestCityNow(mCity.getCityName() + "," + mCity.getIsoCountry()), new JSONObject(),
+                                new Response.Listener<JSONObject>()
+                                {
+                                    @Override
+                                    public void onResponse(JSONObject response)
+                                    {
+                                        try {
+                                            String test = response.toString();
+                                            JSONObject object = new JSONObject(response.toString());
+
+                                            JSONArray weatherArray = object.getJSONArray("weather");
+                                            JSONObject weatherObject = weatherArray.getJSONObject(0);
+                                            Log.d("SetValues", weatherObject.getString("main"));
+                                            mCity.setWeather(weatherObject.getString("main"));
+                                            JSONObject mainObject = object.getJSONObject("main");
+                                            String min = mainObject.getString("temp_min");
+                                            Log.d("SetValues", min);
+                                            mCity.setTemp_min(Double.valueOf(min));
+                                            String max = mainObject.getString("temp_max");
+                                            Log.d("SetValues", max);
+                                            mCity.setTemp_max(Double.valueOf(max));
+                                            String tempp = mainObject.getString("temp");
+                                            Log.d("SetValues", tempp);
+                                            mCity.setTemp(Double.valueOf(tempp));
+                                            mCity.setIcon(weatherObject.getString("icon"));
+                                            ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
+                                        }catch(Exception ex){}
+                                    }
+                                },
+                                new Response.ErrorListener()
+                                {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error)
+                                    {
+                                        // Deal with the error here
+                                    }
+                                });
+                        NetworkSingleton.get(getActivity()).addRequest(jsonObjectRequest,"City View Header Current Date");
+
+
 
 
                     } else {

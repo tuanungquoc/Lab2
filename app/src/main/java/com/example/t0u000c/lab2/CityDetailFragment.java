@@ -76,7 +76,7 @@ public class CityDetailFragment extends Fragment {
     private ArrayList<DayForecast> futureForecastDataset;
 
     private TextView mCityHeader, mToday, mWeatherStatus ,mMax, mMin, mCurrentLocation;
-   // private networkConnect nc;
+    // private networkConnect nc;
     private View v;
 
     private Geocoder geocoder;
@@ -86,6 +86,8 @@ public class CityDetailFragment extends Fragment {
 
     private String[] hourData = new String[8];
     private Date localtime= null;
+
+    private final String photourl= "http://openweathermap.org/img/w/";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -152,7 +154,7 @@ public class CityDetailFragment extends Fragment {
                                                     Log.d("FIVE DARYS", String.valueOf(fiveDaysArray));
 
                                                     dailyForecastDataset = new ArrayList<String>();
-                                                    dailyForecastDataset.add( "Now"+System.getProperty("line.separator")+ mCity.getWeather()+System.getProperty("line.separator")+
+                                                    dailyForecastDataset.add( "Now"+System.getProperty("line.separator")+ photourl+mCity.getIcon()+".png"+System.getProperty("line.separator")+
                                                             (CityListSingleton.get(getActivity()).isDegreeCelcius() ? Api.getFarenheit(mCity.getTemp()) : mCity.getTemp()));
 
 
@@ -215,9 +217,10 @@ public class CityDetailFragment extends Fragment {
                                                                 Log.d("INSIDE HOURLY", fiveDaysArray.getJSONObject(i).getString("dt_txt" ));
 
                                                                 if(counter24hours ==0 && (Integer.parseInt(hr) == Integer.parseInt(UTCnowhourmatch))){
-                                                                    dailyForecastDataset.set(counter24hours,"Now"+ System.getProperty("line.separator")+ fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("main")+System.getProperty("line.separator")+
+                                                                    dailyForecastDataset.set(0,"Now"+ System.getProperty("line.separator")+ photourl+fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("icon")+".png"+System.getProperty("line.separator")+
                                                                             (CityListSingleton.get(getActivity()).isDegreeCelcius() ? Api.getFarenheit( Double.parseDouble(fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp"))) :
-                                                                                    Double.parseDouble(fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp"))));                                                                    counter24hours--;
+                                                                                    fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp")));
+                                                                    counter24hours--;
                                                                 }else{
                                                                     temp=temp+3;
                                                                     if(temp>=24){
@@ -230,7 +233,7 @@ public class CityDetailFragment extends Fragment {
                                                                         ampm=temp+"AM";
                                                                     else
                                                                         ampm=temp+"PM";
-                                                                    dailyForecastDataset.add(ampm+System.getProperty("line.separator")+ fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("main")+System.getProperty("line.separator")+
+                                                                    dailyForecastDataset.add(ampm+System.getProperty("line.separator")+ photourl+fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("icon")+".png"+System.getProperty("line.separator")+
                                                                             (CityListSingleton.get(getActivity()).isDegreeCelcius() ? Api.getFarenheit( Double.parseDouble(fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp"))) :
                                                                                     Double.parseDouble(fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp"))));
 
@@ -241,7 +244,7 @@ public class CityDetailFragment extends Fragment {
                                                                 counter24hours++;
                                                             }
 
-                                                            if((hr.equals(localToUTCnoonmatch) && MyDate.after(localtoUTCincrementeddate))|| ((i== fiveDaysArray.length()-1) && counter5days==4)) {
+                                                            if((hr.equals(localToUTCnoonmatch) && MyDate.after(localtoUTCincrementeddate)  && counter5days < 4)|| ((i== fiveDaysArray.length()-1) && counter5days==3)) {
                                                                 Log.d("DAte:", String.valueOf(MyDate));
                                                                 newdf.applyPattern("EEE");
                                                                 DayForecast dayForecast = new DayForecast(newdf.format(MyDate),
@@ -261,7 +264,7 @@ public class CityDetailFragment extends Fragment {
 
                                                     }
 
-                                                    mDailyForecastAdapter = new DailyForecastAdapter(dailyForecastDataset);
+                                                    mDailyForecastAdapter = new DailyForecastAdapter(getActivity(),dailyForecastDataset);
                                                     mDailyForecastView.setAdapter(mDailyForecastAdapter);
                                                     // specify an adapter (see also next example)
                                                     mFutureForecastAdapter = new FutureForecastAdapter(getActivity(),futureForecastDataset);
@@ -349,11 +352,15 @@ public class CityDetailFragment extends Fragment {
         mWeatherStatus.setText(mCity.getWeather());
         Log.d("SeetingLAyout",mCity.getWeather());
         mMax = (TextView) v.findViewById(R.id.max);
-        mMax.setText(mCity.getTemp_max() + "" + (char) 0x00B0);
-        Log.d("SeetingLAyout",Double.toString( mCity.getTemp_max()));
+        double tempMax = CityListSingleton.get(getActivity()).isDegreeCelcius() ? Api.getFarenheit( mCity.getTemp_max()):
+                mCity.getTemp_max();
+        mMax.setText(tempMax + "" + (char) 0x00B0);
+        Log.d("SeetingLAyout",Double.toString( tempMax));
         mMin = (TextView) v.findViewById(R.id.min);
-        mMin.setText(mCity.getTemp_min() +  "" + (char) 0x00B0);
-        Log.d("SeetingLAyout",Double.toString( mCity.getTemp_min()));
+        double tempMin = CityListSingleton.get(getActivity()).isDegreeCelcius() ? Api.getFarenheit( mCity.getTemp_min()):
+                mCity.getTemp_min();
+        mMin.setText(tempMin +  "" + (char) 0x00B0);
+        Log.d("SeetingLAyout",Double.toString(tempMin));
 
         return v;
 
