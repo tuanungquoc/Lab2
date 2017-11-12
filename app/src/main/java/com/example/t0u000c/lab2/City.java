@@ -12,6 +12,8 @@ import java.util.UUID;
 
 /**
  * Created by t0u000c on 10/21/17.
+ *
+ * This Class provides parameters to save weather and location data for a city chosen and their getters and setters.
  */
 
 public class City {
@@ -74,6 +76,7 @@ public class City {
     public void setState(String state) {
         this.state = state;
     }
+
     public String getCountry() {
         return country;
     }
@@ -82,7 +85,6 @@ public class City {
         this.country = country;
     }
 
-
     public double getLon() {
         return lon;
     }
@@ -90,7 +92,6 @@ public class City {
     public void setLon(double lon) {
         this.lon = lon;
     }
-
 
     public double getLat() {
         return lat;
@@ -164,12 +165,9 @@ public class City {
         this.temp_max = temp_max;
     }
 
-
-
     public UUID getmId() {
         return mId;
     }
-
 
     public String getCityName() {
         return cityName;
@@ -191,7 +189,6 @@ public class City {
         this.temp = temp;
     }
 
-
     public String getCurrentTime() {
         return currentTime;
     }
@@ -199,6 +196,7 @@ public class City {
     public void setCurrentTime(String currentTime) {
         this.currentTime = currentTime;
     }
+
     public String getZoneTime() {
         return zoneTime;
     }

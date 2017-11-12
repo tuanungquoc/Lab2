@@ -15,6 +15,8 @@ import java.util.ArrayList;
 
 /**
  * Created by t0u000c on 10/21/17.
+ *
+ * Adapter to hold 4 days weather data
  */
 
 public class FutureForecastAdapter extends Adapter<FutureForecastAdapter.ViewHolder> {

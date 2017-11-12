@@ -6,7 +6,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
- * Created by VimmiRao on 10/23/2017.
+ * Created by Vimmi Swami on 10/23/2017.
+ * To connect with Network for to hit APIs
  */
 
 public class Connection {

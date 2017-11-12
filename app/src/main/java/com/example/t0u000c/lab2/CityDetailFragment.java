@@ -57,6 +57,9 @@ import android.Manifest;
 
 /**
  * Created by t0u000c on 10/21/17.
+ *
+ * This Class defines functionality to fetch APIs weather and timezone data, clean , convert and populate
+ * data to respective layout parameters.
  */
 
 public class CityDetailFragment extends Fragment {
@@ -101,10 +104,7 @@ public class CityDetailFragment extends Fragment {
         }
     }
 
-
-
-
-
+    // Call APIs:- timezoneDB for current time , timezone and ISO country data, and weather API to fetch weather data for 5days3hrs
     public  void processCityViewTimeZone(final City city){
 
         JsonObjectRequest jsonObjectRequest = null;
@@ -117,7 +117,7 @@ public class CityDetailFragment extends Fragment {
                         public void onResponse(JSONObject response)
                         {
                             mToday=  (TextView) v.findViewById(R.id.today);
-                            //Get and set local date of the city chosen.
+                            //Get and set local date and ISO country info of the city chosen.
                             final JSONObject localzonedata;
                             try {
                                 localzonedata = new JSONObject(response.toString());
@@ -126,8 +126,6 @@ public class CityDetailFragment extends Fragment {
                                 city.setIsoCountry(localzonedata.getString("countryCode"));
                                 SimpleDateFormat newDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                 localtime= newDateFormat.parse(localzonedata.getString("formatted"));
-                                //w.localtimetoUTCunix=con.getUrlData(Api.convertLocalToUTC(object2.getString("zoneName"),newDateFormat.format(localtime)));
-
 
                                 final long localtimetoUTCunix = Long.parseLong(localzonedata.getString("timestamp")) -Long.parseLong( localzonedata.getString("gmtOffset"));
                                 Date todaytimereset= null;
@@ -153,11 +151,13 @@ public class CityDetailFragment extends Fragment {
                                                     JSONArray fiveDaysArray = fiveDays.getJSONArray("list");
                                                     Log.d("FIVE DARYS", String.valueOf(fiveDaysArray));
 
+                                                    // Array to save 24 Hr data
                                                     dailyForecastDataset = new ArrayList<String>();
                                                     dailyForecastDataset.add( "Now"+System.getProperty("line.separator")+ photourl+mCity.getIcon()+".png"+System.getProperty("line.separator")+
                                                             (CityListSingleton.get(getActivity()).isDegreeCelcius() ? Api.getFarenheit(mCity.getTemp()) : mCity.getTemp()));
 
 
+                                                    //Array to save next 4 days Noon time weather info
                                                     futureForecastDataset = new ArrayList<DayForecast>();
                                                     SimpleDateFormat newDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                                     Date today = null;
@@ -167,8 +167,9 @@ public class CityDetailFragment extends Fragment {
                                                         Log.e("City:localtime in 5days", String.valueOf(e));
                                                         e.printStackTrace();
                                                     }
-                                                    int counter5days=0;
+                                                    int counter5days=0;//To count 4 days data processing
 
+                                                    // To fetch local hour and minute corresponding UTC Hour match for weather data
                                                     String UTCnowdatestring = Api.utcToDate(localtimetoUTCunix,"Antarctica/Troll");
                                                     Date UTCnowdate = newDateFormat.parse(UTCnowdatestring);
                                                     Calendar calendar = Calendar.getInstance(); // creates a new calendar instance
@@ -180,7 +181,7 @@ public class CityDetailFragment extends Fragment {
                                                     String UTCnowhourmatch = Api.getMatch(UTCnowdatehour);
                                                     Log.d("UTC NOW HOUR MATCH",String.valueOf(UTCnowhourmatch) );
 
-
+                                                    // To fetch local tomorrow's Noon time to corresponding UTC hour match for next 4 days weather
                                                     String localtoUTCincrementedstring =Api.utcToDate(tomorrowlocaldatetoUTCunix, "Antarctica/Troll");
                                                     Date localtoUTCincrementeddate= newDateFormat.parse(localtoUTCincrementedstring);
                                                     Log.d("Incremented utcdate00hr", String.valueOf(localtoUTCincrementeddate));
@@ -194,11 +195,11 @@ public class CityDetailFragment extends Fragment {
                                                     int localToUTCnoon= Integer.parseInt(newDateFormat.format(localtoUTCincrementednoon));
                                                     String localToUTCnoonmatch = Api.getMatch(localToUTCnoon);
                                                     Log.d("Matched Noon:",localToUTCnoonmatch );
-                                                    //Date localtime= newDateFormat.parse(localzonedata.getString("formatted"));
                                                     int localtimeHR= Integer.parseInt(newDateFormat.format(localtime));
                                                     Log.d("LOCAL TIME HR:",String.valueOf(localtimeHR));
                                                     int temp =localtimeHR;
-                                                    int counter24hours =0;
+                                                    int counter24hours =0;//counts 24 hour data
+                                                    //Loop through fetched weather data
                                                     for(int i = 0 ; i < fiveDaysArray.length() ; i++){
                                                         SimpleDateFormat newdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -212,7 +213,7 @@ public class CityDetailFragment extends Fragment {
 
                                                             Log.d("formating mydate", hr);
                                                             Log.d("is match true?", String.valueOf(MyDate.after(localtoUTCincrementeddate)));
-
+                                                            // To fetch 24 hour (3 hour interval) data by comparing current UTC time to weather data
                                                             if((weatherdatenowunix > localtimetoUTCunix) && counter24hours <8 ){
                                                                 Log.d("INSIDE HOURLY", fiveDaysArray.getJSONObject(i).getString("dt_txt" ));
 
@@ -243,7 +244,7 @@ public class CityDetailFragment extends Fragment {
                                                                 Log.d("coubnter24hr:", String.valueOf(counter24hours));
                                                                 counter24hours++;
                                                             }
-
+                                                            // To fetch next 4 days data based on matched Noon time
                                                             if((hr.equals(localToUTCnoonmatch) && MyDate.after(localtoUTCincrementeddate)  && counter5days < 4)|| ((i== fiveDaysArray.length()-1) && counter5days==3)) {
                                                                 Log.d("DAte:", String.valueOf(MyDate));
                                                                 newdf.applyPattern("EEE");
@@ -263,10 +264,10 @@ public class CityDetailFragment extends Fragment {
                                                         }
 
                                                     }
-
+                                                    //Setting 24 Hr and 4 days related adapters
                                                     mDailyForecastAdapter = new DailyForecastAdapter(getActivity(),dailyForecastDataset);
                                                     mDailyForecastView.setAdapter(mDailyForecastAdapter);
-                                                    // specify an adapter (see also next example)
+
                                                     mFutureForecastAdapter = new FutureForecastAdapter(getActivity(),futureForecastDataset);
                                                     mFutureForecastView.setAdapter(mFutureForecastAdapter);
                                                 } catch (Exception e) {
@@ -352,6 +353,7 @@ public class CityDetailFragment extends Fragment {
         mWeatherStatus.setText(mCity.getWeather());
         Log.d("SeetingLAyout",mCity.getWeather());
         mMax = (TextView) v.findViewById(R.id.max);
+        //If F chosen, convert C to F
         double tempMax = CityListSingleton.get(getActivity()).isDegreeCelcius() ? Api.getFarenheit( mCity.getTemp_max()):
                 mCity.getTemp_max();
         mMax.setText(tempMax + "" + (char) 0x00B0);
@@ -380,173 +382,7 @@ public class CityDetailFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-
-//    private class networkConnect extends AsyncTask<String, Void ,Wrapper> {
-//
-//        private Context mContext;
-//
-//        public networkConnect(Context c){
-//            mContext = c;
-//        }
-//        //@Override
-//        protected void onPostExecute(Wrapper w) {
-//            Log.d("POST ", "inside");
-//            super.onPostExecute(w);
-//            Log.d("Got day values JSON:",w.dayWeather );
-//            Log.d("Got hourly values JSON:",w.hourlyweather );
-//            Log.d("Got timezone data:",w.localtimezone );
-//            Log.d("Got localtime-UTC unix:",Long.toString(w.localtimetoUTCunix ));
-//            Log.d("Got local+1-UTC unix:",Long.toString(w.tomorrowlocaldatetoUTCunix) );
-//            String stream = w.dayWeather;
-//            JSONObject object = null;
-//            JSONObject localzonedata =null;
-//            try {
-//                object = new JSONObject(stream);
-//
-//                JSONArray weatherArray = object.getJSONArray("weather");
-//                JSONObject  weatherObject = weatherArray.getJSONObject(0);
-//                Log.d("SetValues",weatherObject.getString("main") );
-//                mCity.setWeather(weatherObject.getString("main"));
-//                JSONObject mainObject = object.getJSONObject("main");
-//                String  min = mainObject.getString("temp_min");
-//                Log.d("SetValues",min );
-//                mCity.setTemp_min(Double.valueOf(min));
-//                String  max = mainObject.getString("temp_max");
-//                Log.d("SetValues",max );
-//                mCity.setTemp_max(Double.valueOf(max));
-//                String  tempp = mainObject.getString("temp");
-//                Log.d("SetValues",tempp );
-//                mCity.setTemp(Double.valueOf(tempp));
-//
-//                Log.d("TEST",mCity.getCityName());
-//                mCityHeader = (TextView) v.findViewById(R.id.city_header_name);
-//                mCityHeader.setText(mCity.getCityName());
-//
-//                mToday=  (TextView) v.findViewById(R.id.today);
-//                //Get and set local date of the city chosen.
-//                localzonedata = new JSONObject(w.localtimezone);
-//
-//                try {
-//                    mToday.setText(Api.gettodayDate(localzonedata.getString("formatted")));
-//                } catch (ParseException e) {
-//                    Log.e("City:localtime", String.valueOf(e));
-//                    e.printStackTrace();
-//                }
-//
-//
-//                mWeatherStatus = (TextView) v.findViewById(R.id.weatherStatus);
-//                mWeatherStatus.setText(mCity.getWeather());
-//                Log.d("SeetingLAyout",mCity.getWeather());
-//                mMax = (TextView) v.findViewById(R.id.max);
-//                mMax.setText(Double.toString(mCity.getTemp_max()));
-//                Log.d("SeetingLAyout",Double.toString( mCity.getTemp_max()));
-//                mMin = (TextView) v.findViewById(R.id.min);
-//                mMin.setText(Double.toString(mCity.getTemp_min()));
-//                Log.d("SeetingLAyout",Double.toString( mCity.getTemp_min()));
-//
-//
-//                JSONObject fiveDays = new JSONObject(w.hourlyweather);
-//                JSONArray fiveDaysArray = fiveDays.getJSONArray("list");
-//                Log.d("FIVE DARYS", String.valueOf(fiveDaysArray));
-//                futureForecastDataset = new ArrayList<DayForecast>();
-//                SimpleDateFormat newDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                Date today = null;
-//                try {
-//                    today = newDateFormat.parse(localzonedata.getString("formatted"));
-//                } catch (ParseException e) {
-//                    Log.e("City:localtime in 5days", String.valueOf(e));
-//                    e.printStackTrace();
-//                }
-//                int counter5days=0;
-//
-//                String localtoUTCincrementedstring =Api.utcToDate(w.tomorrowlocaldatetoUTCunix, "Antarctica/Troll");
-//                Date localtoUTCincrementeddate= newDateFormat.parse(localtoUTCincrementedstring);
-//                Log.d("Incremented utcdate00hr", String.valueOf(localtoUTCincrementeddate));
-//                Calendar cal = Calendar.getInstance(); // creates calendar
-//                cal.setTime(localtoUTCincrementeddate);// sets calendar time/date
-//                cal.add(Calendar.HOUR_OF_DAY, 12); // adds 12 hour
-//                String localtoUTCincrementednoonstring = newDateFormat.format(cal.getTime());
-//                Log.d("local2utc's tmrw noon",localtoUTCincrementednoonstring);
-//                Date localtoUTCincrementednoon= newDateFormat.parse(localtoUTCincrementednoonstring);
-//                newDateFormat.applyPattern("HH");
-//                int localToUTCnoon= Integer.parseInt(newDateFormat.format(localtoUTCincrementednoon));
-//                String localToUTCnoonmatch = Api.getNoon(localToUTCnoon);
-//                Log.d("Matched Noon:",localToUTCnoonmatch );
-//                for(int i = 0 ; i < fiveDaysArray.length() ; i++){
-//                    SimpleDateFormat newdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//
-//                    try {
-//                        Log.d(String.valueOf(i), fiveDaysArray.getJSONObject(i).getString("dt_txt"));
-//                        Date MyDate = newdf.parse(fiveDaysArray.getJSONObject(i).getString("dt_txt"));
-//                        Log.d("MYYDAte:", String.valueOf(MyDate));
-//                        newdf.applyPattern("HH");
-//                        String hr= String.valueOf(Integer.parseInt(newdf.format(MyDate)));
-//
-//                        Log.d("formating mydate", hr);
-//                        Log.d("is match true?", String.valueOf(MyDate.after(localtoUTCincrementeddate)));
-//
-//                        if((hr.equals(localToUTCnoonmatch) && MyDate.after(localtoUTCincrementeddate))|| ((i== fiveDaysArray.length()-1) && counter5days==4)) {
-//                            Log.d("DAte:", String.valueOf(MyDate));
-//                            newdf.applyPattern("EEE");
-//                            DayForecast dayForecast = new DayForecast(newdf.format(MyDate),
-//                                    fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp_max"),
-//                                    fiveDaysArray.getJSONObject(i).getJSONObject("main").getString("temp_min"),
-//                                    fiveDaysArray.getJSONObject(i).getJSONArray("weather").getJSONObject(0).getString("icon"));
-//                            futureForecastDataset.add(dayForecast);
-//                            counter5days++;
-//                        }
-//                    } catch (ParseException e) {
-//                        Log.e("parsing error","Error in parsing at hourly" );
-//                        e.printStackTrace();
-//                    }
-//
-//                }
-//                // specify an adapter (see also next example)
-//                mFutureForecastAdapter = new FutureForecastAdapter(getActivity(),futureForecastDataset);
-//                mFutureForecastView.setAdapter(mFutureForecastAdapter);
-//            } catch (JSONException e) {
-//                Log.e("In parsing city detail", String.valueOf(e));
-//                e.printStackTrace();
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
-//
-//        }
-//
-//        @Override
-//        protected Wrapper doInBackground(String... strings) {
-//            Connection con = new Connection();
-//            Wrapper w = new Wrapper();
-//            w.dayWeather = con.getUrlData(Api.requestCityNow(mCity.getCityName() + "," + mCity.getIsoCountry()));
-//            w.hourlyweather = con.getUrlData(Api.requestCity24Hrs(mCity.getCityName() + "," + mCity.getIsoCountry()));
-//            try {
-//                JSONObject object = new JSONObject(w.dayWeather);
-//                JSONObject coord = object.getJSONObject("coord");
-//                String lon = coord.getString("lon");
-//                String lat = coord.getString("lat");
-//                w.localtimezone = con.getUrlData(Api.requestTimeZoneData(lat,lon));
-//                JSONObject object2 = new JSONObject(w.localtimezone);
-//                SimpleDateFormat newDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                Date localtime= newDateFormat.parse(object2.getString("formatted"));
-//                //w.localtimetoUTCunix=con.getUrlData(Api.convertLocalToUTC(object2.getString("zoneName"),newDateFormat.format(localtime)));
-//                w.localtimetoUTCunix = Long.parseLong(object2.getString("timestamp")) -Long.parseLong( object2.getString("gmtOffset"));
-//                Date todaytimereset= null;
-//                try {
-//                    todaytimereset = Api.incrementDate(localtime);
-//                } catch (ParseException e) {
-//                    Log.e("Time reset", String.valueOf(e));
-//                    e.printStackTrace();
-//                }
-//                w.tomorrowlocaldatetoUTCunix= Api.datetoUnix(todaytimereset, object2.getString("zoneName"));;
-//
-//            }catch(Exception e){
-//                Log.e("Error in Background", String.valueOf(e));
-//            }
-//            Log.d("Background", "before returning");
-//            return w;
-//        }
-//    }
-
+    // To  verify and seek permission to track location
     private void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this.getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this.getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

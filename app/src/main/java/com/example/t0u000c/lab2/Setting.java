@@ -8,6 +8,8 @@ import java.util.UUID;
 
 /**
  * Created by t0u000c on 11/11/17.
+ *
+ * To allow setting for choosing C/F degree in Temperatures
  */
 
 public class Setting {

@@ -15,7 +15,9 @@ import java.util.TimeZone;
 import static java.lang.Math.round;
 
 /**
- * Created by VimmiSwami on 10/23/2017.
+ * Created by Vimmi Swami on 10/23/2017.
+ *
+ * This Class define various methods to build URL for APIs and other time conversions related methods.
  */
 
 public class Api {
@@ -29,6 +31,7 @@ public class Api {
     public static String localUnixTime="http://api.timezonedb.com/v2/convert-time-zone?key=MRKZ336VAE4Y&format=json&from=Antarctica/Troll";
     public static String localToUTCUnixTime="http://api.timezonedb.com/v2/convert-time-zone?key=MRKZ336VAE4Y&format=json&to=Antarctica/Troll";
 
+    // To build URL for API to fetch current weather data for a place
     public static String requestCityNow(String city){
         StringBuilder sb= new StringBuilder(linkNow);
         sb.append(String.format("?q=%s&APPID=%s&units=metric",city,key));
@@ -36,6 +39,7 @@ public class Api {
         return sb.toString();
     }
 
+    // To build URL for API to fetch 6days weather data for a given place
     public static String requestCity6Days(String city){
         StringBuilder sb= new StringBuilder(linkForecastDays);
         sb.append(String.format("?q=%s&APPID=%s&units=metric&cnt=%s",city,key,"6"));
@@ -43,38 +47,35 @@ public class Api {
         return sb.toString();
     }
 
+    // To fetch local time, timezone and iso country code for a given coordinates
     public static String requestTimeZoneData(String lat, String lng) throws JSONException {
         StringBuilder sb= new StringBuilder(localTimeZone);
         sb.append(String.format("&lat=%s&lng=%s",lat,lng));
 
         Log.d("local data fetched:", sb.toString() );
         return sb.toString();
-        //return sb.toString();
-        //JSONObject object = new JSONObject(sb.toString());
-        //return object.getString("zoneName");
     }
 
+    // To build URL for timezoneDb API to fetch local time of a timezone from UTC time
     public static String convertUTCToLocal(String timezone, String UTC) throws JSONException {
         StringBuilder sb= new StringBuilder(localUnixTime);
         sb.append(String.format("&to=%s&time=%s",timezone,UTC));
         Connection con = new Connection();
-        Log.d("UTC to local json:", sb.toString());
         JSONObject object = new JSONObject(con.getUrlData(sb.toString()));
         return utcToDate(Long.parseLong(object.getString("toTimestamp")), timezone);
 
     }
 
+    // To build URL for timezoneDb API to fetch UTC unix time from given time and timezone
     public static String convertLocalToUTC(String timezone, String localtime) throws JSONException {
         StringBuilder sb= new StringBuilder(localToUTCUnixTime);
         sb.append(String.format("&from=%s&time=%s",timezone,localtime));
         Log.d("Local to UTC json:", sb.toString());
         return sb.toString();
 
-        //return utcToDate(Double.parseDouble(object.getString("toTimestamp")), "Antarctica/Troll");
-
     }
 
-
+    // To fetch URL for 5days3Hrs API based on provided place
     public static String requestCity24Hrs(String city){
         StringBuilder sb= new StringBuilder(linkForecastHourly);
         sb.append(String.format("?q=%s&APPID=%s&units=metric",city,key));
@@ -82,6 +83,7 @@ public class Api {
         return sb.toString();
     }
 
+    //To convert unix time to Hour and minute format
     public static String timeConversion(double unixTime){
         DateFormat df= new SimpleDateFormat("HH:mm");
         Date date = new Date();
@@ -90,6 +92,7 @@ public class Api {
 
     }
 
+    // To fetch only date from date and time
     public static Date dateWithoutTime(Date date) throws ParseException {
         DateFormat df= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         DateFormat dfwotime= new SimpleDateFormat("yyyy-MM-dd");
@@ -98,6 +101,7 @@ public class Api {
 
     }
 
+    // To increment day in a date
     public static Date incrementDate (Date date) throws ParseException {
         date = dateWithoutTime(date);
         DateFormat df= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -113,6 +117,7 @@ public class Api {
 
     }
 
+    // To convert given unix time to given timezone date
     public static String utcToDate(double unixTime, String timezone){
         DateFormat df= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         df.setTimeZone(TimeZone.getTimeZone(timezone));
@@ -123,6 +128,7 @@ public class Api {
 
     }
 
+    // To convert given timezone data to unix time
     public static long datetoUnix(Date date, String timezone){
         DateFormat df= new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dates= df.format(date);
@@ -141,6 +147,7 @@ public class Api {
 
     }
 
+    // To fetch day, month and date from given time
     public static String gettodayDate(String stringDate) throws ParseException {
         DateFormat stringformat=  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = stringformat.parse(stringDate);
@@ -148,6 +155,7 @@ public class Api {
         return df.format(date);
     }
 
+    // To fetch Hour and minutes from given time
     public static String getCurrentTime(String stringDate) throws ParseException {
         SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat outFormat = new SimpleDateFormat("HH:mm");
@@ -155,8 +163,9 @@ public class Api {
         return time24;
     }
 
+    // To fetch current local time for a given timezone
     public static String getCurrentTime1(String timeZone) throws ParseException {
-        //Convert to current time based on the time zone
+
         Date date = new Date();
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a");
@@ -170,6 +179,7 @@ public class Api {
         return time24;
     }
 
+    // To get closest match to UTC Hour number with respect to given number
     public static String getMatch(float myNumber) {
         int[]numbers={0,3,6,9,12,15,18,21,24};
         float distance = Math.abs(numbers[0] - myNumber);
@@ -190,10 +200,12 @@ public class Api {
 
     }
 
+    // To convert C to F
     public static double getFarenheit(double celcius){
         return round((9.0/5.0)*celcius + 32);
     }
 
+    // To convert F to C
     public static double getCelcius(double farenheit){
         return (5.0/9.0)*(farenheit - 32);
     }

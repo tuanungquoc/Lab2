@@ -11,6 +11,8 @@ import android.widget.Switch;
 
 /**
  * Created by t0u000c on 11/9/17.
+ *
+ * To allow user to change C/F settings
  */
 
 public class SettingFragment extends Fragment {
@@ -23,13 +25,6 @@ public class SettingFragment extends Fragment {
 
     }
 
-//    public static CityAddFragment newInstance(UUID uId) {
-//        Bundle args = new Bundle();
-//        args.putSerializable(EXTRA_CITY_ID, uId);
-//        CityAddFragment fragment = new CityAddFragment();
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {

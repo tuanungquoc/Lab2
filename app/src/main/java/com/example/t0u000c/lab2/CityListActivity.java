@@ -15,6 +15,8 @@ import com.google.android.gms.location.places.Places;
 
 /**
  * Created by t0u000c on 10/21/17.
+ *
+ * To use Google API for automatic place suggestions
  */
 
 public class CityListActivity extends SingleFragmentActivity  implements GoogleApiClient.OnConnectionFailedListener {

@@ -19,6 +19,8 @@ import java.util.Set;
 
 /**
  * Created by t0u000c on 11/11/17.
+ *
+ * Allow saving and loading Settings of C/F
  */
 
 public class SettingIntentJSONSerializer {

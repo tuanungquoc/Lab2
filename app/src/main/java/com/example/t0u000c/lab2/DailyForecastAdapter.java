@@ -16,6 +16,8 @@ import java.util.ArrayList;
 
 /**
  * Created by t0u000c on 10/21/17.
+ *
+ * Adapter to hold a city data for 24 hours and allow horizontal scrolling
  */
 
 public class DailyForecastAdapter<T> extends Adapter<DailyForecastAdapter.ViewHolder> {

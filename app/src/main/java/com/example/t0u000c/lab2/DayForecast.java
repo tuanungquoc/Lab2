@@ -2,6 +2,7 @@ package com.example.t0u000c.lab2;
 
 /**
  * Created by t0u000c on 10/21/17.
+ * To hold data for each day data for 4day weather for a city
  */
 
 public class DayForecast {

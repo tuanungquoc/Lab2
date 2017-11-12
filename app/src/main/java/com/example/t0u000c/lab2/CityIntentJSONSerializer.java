@@ -18,6 +18,8 @@ import java.util.ArrayList;
 
 /**
  * Created by t0u000c on 10/31/17.
+ *
+ * Allow saving and loading cities.
  */
 
 public class CityIntentJSONSerializer {

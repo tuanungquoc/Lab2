@@ -40,6 +40,8 @@ import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by t0u000c on 10/21/17.
+ * Enables adding of city using Google API
+ * Allows listing/deletion of cities, load/refresh current weather and time data
  */
 
 public class CityListFragment extends ListFragment {

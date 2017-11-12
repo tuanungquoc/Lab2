@@ -23,6 +23,8 @@ import java.util.UUID;
 
 /**
  * Created by t0u000c on 10/21/17.
+ *
+ * This Fragment Class defines functionality and validations to add a city in app
  */
 
 public class CityAddFragment extends Fragment {
@@ -69,8 +71,6 @@ public class CityAddFragment extends Fragment {
         autoCompleteTextView = (AutoCompleteTextView) v.findViewById(R.id.autoCompleteTextView);
         String[] words = getResources().getStringArray(R.array.auto_complete);
 
-//        UUID cityId = (UUID) getActivity().getIntent().getSerializableExtra(CityAddFragment.EXTRA_CITY_ID);
-//        mCity = CityListSingleton.get(getActivity()).getCity(cityId);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, words);
         autoCompleteTextView.setAdapter(adapter);
 
@@ -79,7 +79,7 @@ public class CityAddFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String cityName = (String) autoCompleteTextView.getAdapter().getItem(i);
                 Log.d(TAG1, cityName + " is selected");
-                //serch to see if city already exists
+                //search to see if city already exists
                 int pos = CityListSingleton.get(getActivity()).getCityByName(cityName);
                 if (pos == -1) {
                     mCity.setCityName(cityName);

@@ -10,6 +10,8 @@ import com.squareup.okhttp.OkHttpClient;
 
 /**
  * Created by t0u000c on 11/3/17.
+ *
+ * Volley related network functionality
  */
 
 public class NetworkSingleton {

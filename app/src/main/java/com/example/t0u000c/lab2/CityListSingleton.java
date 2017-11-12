@@ -12,6 +12,8 @@ import java.util.ArrayList;
 
 /**
  * Created by t0u000c on 10/21/17.
+ *
+ * Allow saving and loading cities and C/F settings
  */
 
 public class CityListSingleton {

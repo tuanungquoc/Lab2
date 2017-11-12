@@ -4,6 +4,8 @@ import android.support.v4.app.Fragment;
 
 /**
  * Created by t0u000c on 11/9/17.
+ *
+ * Activity holding Fragment info.
  */
 
 public class SettingActivity extends SingleFragmentActivity {

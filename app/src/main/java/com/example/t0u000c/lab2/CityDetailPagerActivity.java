@@ -12,6 +12,8 @@ import java.util.UUID;
 
 /**
  * Created by t0u000c on 10/22/17.
+ *
+ * To allow swipe to saved cities details
  */
 
 public class CityDetailPagerActivity extends FragmentActivity {

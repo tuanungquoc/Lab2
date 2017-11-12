@@ -14,6 +14,8 @@ import java.util.UUID;
 
 /**
  * Created by t0u000c on 10/21/17.
+ *
+ * Provides and Activity class and related Fragment information to handle adding city functionality using Google API
  */
 
 public class CityAddActivity extends SingleFragmentActivity implements GoogleApiClient.OnConnectionFailedListener  {
