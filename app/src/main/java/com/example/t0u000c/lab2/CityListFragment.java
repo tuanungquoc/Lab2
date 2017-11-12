@@ -188,6 +188,7 @@ public class CityListFragment extends ListFragment {
             getActivity().setTitle(R.string.app_name);
             setHasOptionsMenu(true);
             mCities = CityListSingleton.get(getActivity()).getmCities();
+
             //calling city weather to update
             for(int i = 0 ; i < mCities.size(); i++){
                 final City mCity = mCities.get(i);
@@ -252,6 +253,7 @@ public class CityListFragment extends ListFragment {
         public void onPause() {
             super.onPause();
             CityListSingleton.get(getActivity()).saveCrimes();
+            CityListSingleton.get(getActivity()).saveSettings();
         }
 
         @Override

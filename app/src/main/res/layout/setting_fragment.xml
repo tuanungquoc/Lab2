@@ -1,25 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <TextView
+    android:layout_height="match_parent"
+    android:weightSum="1">
 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Celcius"
-        android:textSize="18sp" />
     <Switch
         android:id="@+id/setting_temp_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-       />
-
-    <TextView
-
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="Farenheit"
-        android:textSize="18sp" />
+        android:text="Degree Type:"
+        android:textOff="Celcius"
+        android:textOn="Fahrenheit"
+        android:layout_weight="0.08" />
 
 </LinearLayout>

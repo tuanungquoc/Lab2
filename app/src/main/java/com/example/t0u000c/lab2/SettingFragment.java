@@ -37,6 +37,9 @@ public class SettingFragment extends Fragment {
         final Switch simpleSwitch = (Switch) v.findViewById(R.id.setting_temp_type    );
         if(CityListSingleton.get(getActivity()).isDegreeCelcius())
             simpleSwitch.setChecked(true);
+        else
+            simpleSwitch.setChecked(false);
+
         simpleSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -45,4 +48,11 @@ public class SettingFragment extends Fragment {
         });
         return v;
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        CityListSingleton.get(getActivity()).saveSettings();
+    }
+
 }
