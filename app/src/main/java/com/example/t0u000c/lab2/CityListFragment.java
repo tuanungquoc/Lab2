@@ -338,7 +338,9 @@ public class CityListFragment extends ListFragment {
                                                             @Override
                                                             public void onErrorResponse(VolleyError error)
                                                             {
-                                                                Toast.makeText(getActivity(), "there is an err api in this city", Toast.LENGTH_LONG).show();
+                                                                Toast.makeText(getActivity(), "The weather API throws error for"+mCity.getCityName()+". Removing", Toast.LENGTH_LONG).show();
+                                                                CityListSingleton.get(getActivity()).deleteCity(mCity);
+                                                                ((ArrayAdapter<City>)getListAdapter()).notifyDataSetChanged();
                                                             }
                                                         });
                                                 NetworkSingleton.get(getActivity()).addRequest(jsonObjectRequest,"City View Header Current Date");
