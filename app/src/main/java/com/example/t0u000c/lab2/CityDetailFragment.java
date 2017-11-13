@@ -351,7 +351,7 @@ public class CityDetailFragment extends Fragment {
         mCityHeader.setText(mCity.getCityName());
         mWeatherStatus = (TextView) v.findViewById(R.id.weatherStatus);
         mWeatherStatus.setText(mCity.getWeather());
-        Log.d("SeetingLAyout",mCity.getWeather());
+        //Log.d("SeetingLAyout",mCity.getWeather());
         mMax = (TextView) v.findViewById(R.id.max);
         //If F chosen, convert C to F
         double tempMax = CityListSingleton.get(getActivity()).isDegreeCelcius() ? Api.getFarenheit( mCity.getTemp_max()):

@@ -142,8 +142,7 @@ public class CityListFragment extends ListFragment {
                         new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                //retry if it fails
-                                executeTempRequest(mCity);
+                                Toast.makeText(getActivity(), "there is an err api in this city", Toast.LENGTH_LONG).show();
                             }
                         });
                 NetworkSingleton.get(getActivity()).addRequest(jsonObjectRequest, "City View Header Current Date");
@@ -339,7 +338,7 @@ public class CityListFragment extends ListFragment {
                                                             @Override
                                                             public void onErrorResponse(VolleyError error)
                                                             {
-                                                                // Deal with the error here
+                                                                Toast.makeText(getActivity(), "there is an err api in this city", Toast.LENGTH_LONG).show();
                                                             }
                                                         });
                                                 NetworkSingleton.get(getActivity()).addRequest(jsonObjectRequest,"City View Header Current Date");
@@ -354,6 +353,7 @@ public class CityListFragment extends ListFragment {
                                         public void onErrorResponse(VolleyError error)
                                         {
                                             // Deal with the error here
+                                            Toast.makeText(getActivity(), "there is something wrong with the timezone", Toast.LENGTH_LONG).show();
                                         }
                                     });
 
